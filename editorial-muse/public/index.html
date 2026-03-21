@@ -1325,46 +1325,6 @@ async function loadStats(){
 /* ══════════════════════════════════════
    SETTINGS
 ══════════════════════════════════════ */
-async function loadSettings() {
-  if (!S.backendOnline) return;
-  try {
-    const res  = await fetch(API_BASE+'/settings');
-    const data = await res.json();
-    const s    = data.settings || {};
-    const set  = (id, val) => { const el=document.getElementById(id); if(el && val) el.value=val; };
-    set('cfg-email-user',   s.EMAIL_USER);
-    set('cfg-email-host',   s.EMAIL_HOST   || 'smtp.gmail.com');
-    set('cfg-email-port',   s.EMAIL_PORT   || '587');
-    set('cfg-email-from',   s.EMAIL_FROM);
-    set('cfg-twilio-sid',   s.TWILIO_ACCOUNT_SID);
-    set('cfg-twilio-from',  s.TWILIO_WHATSAPP_FROM);
-    set('cfg-app-url',      s.APP_URL);
-    // Password fields show placeholder if set
-    if (s.EMAIL_PASS)        document.getElementById('cfg-email-pass').placeholder   = '(saved — leave blank to keep)';
-    if (s.TWILIO_AUTH_TOKEN) document.getElementById('cfg-twilio-token').placeholder = '(saved — leave blank to keep)';
-  } catch(_) {}
-}
-
-async function saveSettings() {
-  if (!S.backendOnline) { showSettingsStatus('Backend not connected. Start the server first.', 'error'); return; }
-  const btn = document.getElementById('settings-save-btn');
-  const txt = document.getElementById('settings-save-txt');
-  btn.disabled = true; txt.textContent = 'Saving…';
-
-  const payload = {
-    EMAIL_HOST:             document.getElementById('cfg-email-host').value.trim(),
-    EMAIL_PORT:             document.getElementById('cfg-email-port').value.trim(),
-    EMAIL_USER:             document.getElementById('cfg-email-user').value.trim(),
-    EMAIL_FROM:             document.getElementById('cfg-email-from').value.trim(),
-    APP_URL:                document.getElementById('cfg-app-url').value.trim(),
-    TWILIO_ACCOUNT_SID:     document.getElementById('cfg-twilio-sid').value.trim(),
-    TWILIO_WHATSAPP_FROM:   document.getElementById('cfg-twilio-from').value.trim(),
-  };
-  // Only include passwords if user typed something new
-  const emailPass  = document.getElementById('cfg-email-pass').value;
-  const twilioTok  = document.getElementById('cfg-twilio-token').value;
-  if (emailPass && emailPass !== '••••••••') payload.EMAIL_PASS = emailPass;
-  if (twilioTok && twilioTok !== '••••••••') payload.TWILIO_AUTH_TOKEN = twilioTok;
 
   try {
     const res  = await fetch(API_BASE+'/settings', {

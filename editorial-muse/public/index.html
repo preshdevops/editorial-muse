@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The Editorial Muse</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+  tailwind.config = {
+    darkMode:"class",
+    theme:{extend:{
+      colors:{
+        "c-bg":"#fdf9f0","c-surf-low":"#f7f3ea","c-surf-mid":"#f1eee5",
+        "c-surf-high":"#ece8df","c-surf-top":"#e6e2d9","c-white":"#ffffff",
+        "c-on":"#1c1c17","c-on-v":"#5b403d",
+        "c-pri":"#ae1417","c-pri-dk":"#d2312c","c-pri-lt":"#ffdad6","c-pri-dim":"#ffb4ab",
+        "c-sec":"#805062","c-sec-ct":"#fec1d6","c-tert":"#9f2561",
+        "c-inv":"#31312b","c-inv-on":"#f4f0e8",
+        "c-out":"#8f6f6c","c-out-v":"#e4beba",
+        "c-wa":"#25d366","c-wa-lt":"#dcf8c6",
+      },
+      fontFamily:{headline:["Noto Serif","serif"],body:["Manrope","sans-serif"],label:["Manrope","sans-serif"]},
+    }},
+  };
+</script>
+<style>
+:root{
+  --c-bg:#fdf9f0;--c-surf-low:#f7f3ea;--c-surf-mid:#f1eee5;--c-surf-high:#ece8df;--c-surf-top:#e6e2d9;
+  --c-white:#ffffff;--c-on:#1c1c17;--c-on-v:#5b403d;
+  --c-pri:#ae1417;--c-pri-dk:#d2312c;--c-pri-lt:#ffdad6;--c-pri-dim:#ffb4ab;
+  --c-sec:#805062;--c-sec-ct:#fec1d6;--c-tert:#9f2561;
+  --c-inv:#31312b;--c-inv-on:#f4f0e8;--c-out:#8f6f6c;--c-out-v:#e4beba;
+  --c-wa:#25d366;--c-wa-lt:#dcf8c6;
+  --accent:#ae1417;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--c-bg);color:var(--c-on);font-family:'Manrope',sans-serif}
+::selection{background:var(--c-sec-ct)}
+.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;vertical-align:middle;user-select:none}
+
+.sh-nav{box-shadow:0 40px 40px -15px rgba(28,28,23,.05)}
+.sh-canvas{box-shadow:0 40px 60px -20px rgba(28,28,23,.10)}
+.sh-float{box-shadow:0 8px 32px rgba(28,28,23,.12)}
+
+.paper::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E")}
+.lined{background-image:repeating-linear-gradient(transparent 0,transparent 35px,var(--c-surf-top) 35px,var(--c-surf-top) 36px);background-attachment:local}
+.serif-it{font-family:'Noto Serif',serif;font-style:italic}
+.vellum{background:rgba(255,255,255,.65);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+
+/* Pages */
+.page{display:none;opacity:0;transform:translateY(8px);transition:opacity .35s ease,transform .35s ease}
+.page.show{display:block}.page.visible{opacity:1;transform:translateY(0)}
+
+/* Nav */
+.nav-btn{background:transparent;border:0;cursor:pointer;color:var(--c-sec);transition:color .2s;padding:0;font-family:'Noto Serif',serif;font-size:.875rem}
+.nav-btn:hover{color:var(--c-pri)}
+.nav-btn[aria-current="page"]{color:var(--c-pri);border-bottom:2px solid var(--c-pri);padding-bottom:3px}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+.au{opacity:0;animation:fadeUp .6s ease forwards}
+.au1{animation-delay:.10s}.au2{animation-delay:.22s}.au3{animation-delay:.38s}.au4{animation-delay:.52s}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin .8s linear infinite}
+@keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.3}}
+.pulse{animation:pulseDot 1.4s ease infinite}
+
+/* Envelope */
+.env-wrap{perspective:600px}
+.env-flap{transform-origin:top center;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.4,0,.2,1)}
+.env-flap.open{transform:rotateX(180deg)}
+.env-letter{opacity:0;transform:translateY(0);transition:transform .55s ease .4s,opacity .4s ease .4s}
+.env-letter.rise{opacity:1;transform:translateY(-72px)}
+.sent-msg{opacity:0;transform:translateY(18px);transition:opacity .5s ease .85s,transform .5s ease .85s}
+.sent-msg.show{opacity:1;transform:translateY(0)}
+
+/* Modals */
+.modal{display:none;opacity:0;transition:opacity .3s ease;position:fixed;inset:0;z-index:200;align-items:center;justify-content:center;background:rgba(28,28,23,.42);backdrop-filter:blur(4px);padding:16px}
+.modal.open{display:flex;opacity:1}
+.modal.closing{display:flex;opacity:0;pointer-events:none}
+
+/* Swatch */
+.swatch{transition:transform .2s,box-shadow .2s;cursor:pointer;border:0;padding:0}
+.swatch:hover{transform:scale(1.15)}
+.swatch[aria-checked="true"]{box-shadow:0 0 0 3px var(--c-bg),0 0 0 5px var(--accent);transform:scale(1.1)}
+
+/* Song */
+.song{transition:background .2s;cursor:pointer;border-left:3px solid transparent;border-radius:12px}
+.song:hover{background:var(--c-surf-high)}
+.song[aria-selected="true"]{border-left-color:var(--c-pri);background:var(--c-surf-low)}
+
+/* Channel selector */
+.channel-card{border:2px solid var(--c-out-v);border-radius:16px;padding:20px;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;background:var(--c-white)}
+.channel-card:hover{border-color:var(--c-pri);transform:translateY(-2px)}
+.channel-card.selected-email{border-color:var(--c-pri);background:var(--c-pri-lt)}
+.channel-card.selected-wa{border-color:var(--c-wa);background:var(--c-wa-lt)}
+
+/* Inbox */
+.msg-row{transition:background .15s,box-shadow .15s;cursor:pointer}
+.msg-row:hover{background:var(--c-surf-low)}
+.status-badge{display:inline-flex;align-items:center;gap:4px;border-radius:9999px;padding:3px 10px;font-size:.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.badge-sent{background:#dbeafe;color:#1e40af}
+.badge-read{background:#dcfce7;color:#166534}
+.badge-failed{background:#fee2e2;color:#991b1b}
+.badge-draft{background:var(--c-surf-top);color:var(--c-sec)}
+
+/* Filter pill */
+.fpill{transition:all .22s;cursor:pointer;border:0}
+.fpill[aria-pressed="true"]{background:var(--c-pri)!important;color:#fff!important}
+
+/* Lift */
+.lift{transition:transform .3s,box-shadow .3s}
+.lift:hover{transform:translateY(-5px);box-shadow:0 20px 40px rgba(28,28,23,.11)}
+
+/* Heart */
+.hbtn{transition:color .2s,transform .15s;background:transparent;border:0;cursor:pointer;padding:4px}
+.hbtn:hover{transform:scale(1.2)}
+.hbtn[aria-pressed="true"]{color:var(--c-pri)}
+.hbtn[aria-pressed="true"] .hi{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24}
+
+/* Toolbar */
+.tbtn{transition:background .15s;border:0;cursor:pointer;padding:8px;background:var(--c-surf-low);border-radius:4px}
+.tbtn:hover,.tbtn[aria-pressed="true"]{background:var(--c-surf-high)}
+
+/* Focus */
+:focus-visible{outline:2px solid var(--c-pri);outline-offset:3px}
+textarea:focus,input:focus{outline:none;box-shadow:none!important}
+
+/* Validation */
+.ferr{border-bottom:2px solid var(--c-pri)!important}
+.emsg{color:var(--c-pri);font-size:.69rem;margin-top:2px;display:none}
+.emsg.on{display:block}
+
+/* Download btn */
+.dlbtn{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--c-out-v);border-radius:9999px;padding:9px 18px;font-size:.69rem;font-family:'Manrope',sans-serif;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--c-sec);background:transparent;cursor:pointer;transition:border-color .2s,color .2s,background .2s;width:100%;justify-content:center}
+.dlbtn:hover{border-color:var(--c-pri);color:var(--c-pri);background:var(--c-pri-lt)}
+
+/* Stats cards */
+.stat-card{background:var(--c-white);border-radius:16px;padding:24px 28px;border:1px solid var(--c-out-v)/30}
+
+/* API alert */
+.api-alert{background:#fef3c7;border:1px solid #fcd34d;color:#92400e;border-radius:12px;padding:14px 18px;font-size:.8rem;line-height:1.5}
+</style>
+</head>
+<body class="bg-c-bg text-c-on font-body antialiased">
+
+<!-- ═══════ TOP NAV ═══════ -->
+<header class="sticky top-0 bg-c-bg sh-nav z-50" role="banner">
+  <div class="max-w-7xl mx-auto px-6 md:px-12 py-5 flex justify-between items-center">
+    <button data-nav="home" class="nav-btn text-2xl font-headline italic text-c-on" aria-label="Go to homepage">The Editorial Muse</button>
+    <nav class="hidden md:flex items-center gap-10" aria-label="Main">
+      <button data-nav="create"    id="nav-create"    class="nav-btn" aria-current="false">Compose</button>
+      <button data-nav="inbox"     id="nav-inbox"     class="nav-btn" aria-current="false">Inbox</button>
+      <button data-nav="templates" id="nav-templates" class="nav-btn" aria-current="false">Templates</button>
+      <button data-nav="settings"  id="nav-settings"  class="nav-btn" aria-current="false">Settings</button>
+    </nav>
+    <button data-nav="create" class="bg-gradient-to-r from-c-pri to-c-pri-dk text-white rounded-full px-7 py-2.5 font-label font-semibold text-xs tracking-widest uppercase sh-float active:scale-95 transition-transform border-0 cursor-pointer">Send Love</button>
+  </div>
+</header>
+
+<!-- ═══════ PAGE: HOME ═══════ -->
+<div id="page-home" class="page" role="main">
+  <section class="relative min-h-[88vh] flex items-center overflow-hidden">
+    <div class="absolute right-0 top-0 w-[55vw] h-full pointer-events-none" aria-hidden="true">
+      <div class="absolute inset-0 bg-gradient-to-l from-c-surf-low to-transparent"></div>
+      <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLXVlYvSGfi25XQ-UHXqrGAQvnMNtbEfSZK8tVuyrXJ695brTXYtWQdtQDRFYFhFjTryWSVJ4fCdnvpUrFtF6NXBddXBi2YyGCvvfyexodQ9ENsD__Z3Uogop2ELBGRIPJ30QulE3PdFZQqPgmBDycBeD1ODr7SONUPMFnSpuD4XfL-odK3QMg_YKheSjqf2IGEE-NT4UA6LnyzZn4uvrMxbybyLuPHpQ0xjxSNv7h26NCxey3ShkQdT0DACEuU8qAjJ_-kBAzncRO" alt="" class="w-full h-full object-cover opacity-30 mix-blend-multiply"/>
+    </div>
+    <div class="max-w-7xl mx-auto px-6 md:px-12 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
+      <div class="py-20">
+        <span class="au au1 font-label uppercase tracking-[.22em] text-c-sec text-xs mb-6 block">Digital Stationery Reimagined</span>
+        <h1 class="au au2 font-headline text-6xl md:text-8xl text-c-on leading-[.88] mb-8">Write from <br/><span class="italic text-c-pri">the heart.</span></h1>
+        <p class="au au3 font-body text-lg text-c-on-v max-w-md mb-12 leading-relaxed">Every message is a curated gift. Send via email or WhatsApp, track when it's read, and keep every letter forever.</p>
+        <div class="au au4 flex flex-col sm:flex-row gap-5">
+          <button data-nav="create" class="bg-gradient-to-br from-c-pri to-c-pri-dk text-white px-10 py-4 rounded-full font-label font-bold text-xs uppercase tracking-widest shadow-xl hover:opacity-90 transition-all active:scale-95 border-0 cursor-pointer">Start Creating Your Message</button>
+          <button data-nav="inbox" class="text-c-sec font-label font-medium border-b border-c-sec/30 pb-0.5 self-center hover:border-c-sec/70 transition-all text-sm bg-transparent border-0 cursor-pointer">View Sent Messages →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats bar -->
+  <section class="py-16 bg-c-surf-low" id="home-stats">
+    <div class="max-w-7xl mx-auto px-6 md:px-12">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="stat-card text-center"><p class="font-headline text-4xl text-c-pri font-bold" id="stat-total">—</p><p class="font-label text-xs uppercase tracking-widest text-c-sec mt-2">Letters Written</p></div>
+        <div class="stat-card text-center"><p class="font-headline text-4xl text-c-pri font-bold" id="stat-sent">—</p><p class="font-label text-xs uppercase tracking-widest text-c-sec mt-2">Delivered</p></div>
+        <div class="stat-card text-center"><p class="font-headline text-4xl text-c-pri font-bold" id="stat-read">—</p><p class="font-label text-xs uppercase tracking-widest text-c-sec mt-2">Hearts Opened</p></div>
+        <div class="stat-card text-center"><p class="font-headline text-4xl text-c-wa font-bold" id="stat-wa">—</p><p class="font-label text-xs uppercase tracking-widest text-c-sec mt-2">Via WhatsApp</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-28 bg-c-surf-low">
+    <div class="max-w-7xl mx-auto px-6 md:px-12">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-16">
+        <div class="group">
+          <div class="w-14 h-14 rounded-full bg-c-white flex items-center justify-center mb-8 sh-float group-hover:bg-c-pri transition-colors duration-500 lift"><span class="material-symbols-outlined text-c-pri group-hover:text-white">auto_awesome</span></div>
+          <h3 class="font-headline text-xl mb-3">Compose your letter</h3>
+          <p class="font-body text-sm text-c-on-v leading-relaxed">Write with style. Pick colors, fonts, and a song that sets the mood.</p>
+        </div>
+        <div class="group md:mt-12">
+          <div class="w-14 h-14 rounded-full bg-c-white flex items-center justify-center mb-8 sh-float group-hover:bg-c-pri transition-colors duration-500 lift"><span class="material-symbols-outlined text-c-pri group-hover:text-white">send</span></div>
+          <h3 class="font-headline text-xl mb-3">Send via Email or WhatsApp</h3>
+          <p class="font-body text-sm text-c-on-v leading-relaxed">Choose how it arrives. Email brings a beautiful HTML card; WhatsApp delivers instantly.</p>
+        </div>
+        <div class="group md:mt-24">
+          <div class="w-14 h-14 rounded-full bg-c-white flex items-center justify-center mb-8 sh-float group-hover:bg-c-pri transition-colors duration-500 lift"><span class="material-symbols-outlined text-c-pri group-hover:text-white">visibility</span></div>
+          <h3 class="font-headline text-xl mb-3">Track when it's read</h3>
+          <p class="font-body text-sm text-c-on-v leading-relaxed">Know the moment your letter is opened. Every heart opened is logged in your inbox.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════ PAGE: CREATE ═══════ -->
+<div id="page-create" class="page" role="main">
+  <div class="min-h-screen max-w-7xl mx-auto px-6 md:px-12 py-12">
+    <div class="flex flex-col lg:flex-row gap-14 items-start">
+
+      <!-- Sidebar -->
+      <aside class="w-full lg:w-72 flex flex-col gap-10 order-2 lg:order-1 lg:sticky lg:top-28">
+
+        <!-- Channel Selector -->
+        <section aria-labelledby="lbl-channel">
+          <p id="lbl-channel" class="font-label text-[10px] uppercase tracking-[.22em] text-c-sec mb-4">Send via</p>
+          <div class="grid grid-cols-2 gap-3">
+            <button class="channel-card flex flex-col items-center gap-2 selected-email" id="ch-email" onclick="selectChannel('email')" aria-pressed="true" aria-label="Send via Email">
+              <span class="material-symbols-outlined text-c-pri" style="font-size:2rem">mail</span>
+              <span class="font-label text-xs font-bold tracking-wider text-c-pri">Email</span>
+            </button>
+            <button class="channel-card flex flex-col items-center gap-2" id="ch-wa" onclick="selectChannel('whatsapp')" aria-pressed="false" aria-label="Send via WhatsApp">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="16" cy="16" r="16" fill="#25d366"/>
+                <path d="M16 7.5C11.3 7.5 7.5 11.3 7.5 16c0 1.5.4 3 1.1 4.2L7.5 24.5l4.4-1.1c1.2.6 2.6 1 4.1 1 4.7 0 8.5-3.8 8.5-8.5S20.7 7.5 16 7.5zm4.9 11.8c-.2.6-1.2 1.1-1.6 1.2-.4.1-.9.1-2.9-.6-2.5-1-4-3.5-4.1-3.7-.1-.2-1-1.3-1-2.4 0-1.1.6-1.7.8-1.9.2-.2.5-.3.7-.3h.5c.2 0 .4.1.5.4.2.4.8 2 .8 2.1.1.1.1.3 0 .4-.1.1-.1.2-.2.3l-.3.3c-.1.1-.2.2-.1.4.1.2.5.8 1.1 1.3.8.7 1.4.9 1.6 1 .2.1.4 0 .5-.1l.4-.5c.1-.2.3-.2.5-.1l1.5.7c.2.1.4.2.4.4.1.2 0 .9-.1 1.1z" fill="white"/>
+              </svg>
+              <span class="font-label text-xs font-bold tracking-wider" style="color:#25d366">WhatsApp</span>
+            </button>
+          </div>
+          <!-- Contact field changes based on channel -->
+          <div class="mt-4">
+            <label for="f-contact" id="contact-label" class="font-label text-[10px] uppercase tracking-widest text-c-sec mb-2 block">Recipient Email</label>
+            <input id="f-contact" type="email" placeholder="their@email.com" autocomplete="off"
+              class="w-full bg-c-surf-low border border-c-out-v rounded-xl px-4 py-3 font-body text-sm text-c-on focus:border-c-pri transition-colors"/>
+            <p id="e-contact" class="emsg" role="alert">Please enter a valid contact.</p>
+          </div>
+        </section>
+
+        <!-- Color -->
+        <section aria-labelledby="lbl-color">
+          <p id="lbl-color" class="font-label text-[10px] uppercase tracking-[.22em] text-c-sec mb-5">Pick a Color</p>
+          <div class="flex flex-wrap gap-3" role="radiogroup" aria-labelledby="lbl-color">
+            <button class="swatch w-9 h-9 rounded-full" style="background:var(--c-pri)" data-swatch="#ae1417" aria-checked="true" aria-label="Crimson Red"></button>
+            <button class="swatch w-9 h-9 rounded-full" style="background:var(--c-sec-ct)" data-swatch="#fec1d6" aria-checked="false" aria-label="Blush Pink"></button>
+            <button class="swatch w-9 h-9 rounded-full" style="background:#d4af37" data-swatch="#d4af37" aria-checked="false" aria-label="Gold Leaf"></button>
+            <button class="swatch w-9 h-9 rounded-full border border-c-out-v" style="background:var(--c-surf-mid)" data-swatch="#f1eee5" aria-checked="false" aria-label="Classic Cream"></button>
+            <button class="swatch w-9 h-9 rounded-full" style="background:var(--c-sec)" data-swatch="#805062" aria-checked="false" aria-label="Dusty Mauve"></button>
+          </div>
+        </section>
+
+        <!-- Songs -->
+        <section aria-labelledby="lbl-song">
+          <p id="lbl-song" class="font-label text-[10px] uppercase tracking-[.22em] text-c-sec mb-5">Select a Song</p>
+          <div class="flex flex-col gap-2" role="listbox" aria-labelledby="lbl-song">
+            <div class="song p-3.5 flex items-center gap-3" role="option" tabindex="0" aria-selected="false" data-song="0"><span class="sicon material-symbols-outlined text-c-sec text-lg">play_circle</span><div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate">Moonlight Sonata</p><p class="text-[10px] text-c-sec uppercase tracking-wider">Classical Romance</p></div></div>
+            <div class="song p-3.5 flex items-center gap-3" role="option" tabindex="0" aria-selected="false" data-song="1"><span class="sicon material-symbols-outlined text-c-sec text-lg">play_circle</span><div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate">At Last</p><p class="text-[10px] text-c-sec uppercase tracking-wider">Etta James</p></div></div>
+            <div class="song p-3.5 flex items-center gap-3" role="option" tabindex="0" aria-selected="false" data-song="2"><span class="sicon material-symbols-outlined text-c-sec text-lg">play_circle</span><div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate">First Day of My Life</p><p class="text-[10px] text-c-sec uppercase tracking-wider">Acoustic Indie</p></div></div>
+          </div>
+        </section>
+
+        <!-- Typography -->
+        <section aria-labelledby="lbl-typo">
+          <p id="lbl-typo" class="font-label text-[10px] uppercase tracking-[.22em] text-c-sec mb-5">Typography</p>
+          <div class="grid grid-cols-2 gap-2 mb-3">
+            <button onclick="setFont('serif')" class="py-2.5 px-3 bg-c-surf-low rounded-lg text-sm font-headline hover:bg-c-surf-high transition-colors border-0 cursor-pointer">Romantic Serif</button>
+            <button onclick="setFont('sans')"  class="py-2.5 px-3 bg-c-surf-low rounded-lg text-sm font-body  hover:bg-c-surf-high transition-colors border-0 cursor-pointer">Modern Sans</button>
+          </div>
+          <div class="flex gap-2" role="toolbar" aria-label="Text formatting">
+            <button id="btn-bold"   onclick="toggleFmt('bold')"   class="tbtn" aria-pressed="false" aria-label="Bold"><span class="material-symbols-outlined text-c-sec text-base">format_bold</span></button>
+            <button id="btn-italic" onclick="toggleFmt('italic')" class="tbtn" aria-pressed="false" aria-label="Italic"><span class="material-symbols-outlined text-c-sec text-base">format_italic</span></button>
+            <button id="btn-center" onclick="toggleFmt('center')" class="tbtn" aria-pressed="false" aria-label="Center align"><span class="material-symbols-outlined text-c-sec text-base">format_align_center</span></button>
+          </div>
+        </section>
+
+        <!-- Scheduled Send -->
+        <section aria-labelledby="lbl-sched">
+          <p id="lbl-sched" class="font-label text-[10px] uppercase tracking-[.22em] text-c-sec mb-4">Schedule Send</p>
+          <div class="bg-c-surf-low rounded-xl p-4">
+            <label for="f-schedule" class="font-label text-[10px] text-c-sec block mb-2">Send at (optional)</label>
+            <input id="f-schedule" type="datetime-local" class="w-full bg-c-white border border-c-out-v rounded-lg px-3 py-2 font-body text-sm text-c-on focus:border-c-pri transition-colors"/>
+            <p class="font-label text-[9px] text-c-sec mt-2 leading-relaxed">Leave empty to send immediately. The server checks every 60 seconds.</p>
+          </div>
+        </section>
+
+        <!-- Download -->
+        <section aria-labelledby="lbl-dl">
+          <p id="lbl-dl" class="font-label text-[10px] uppercase tracking-[.22em] text-c-sec mb-5">Download Letter</p>
+          <div class="flex flex-col gap-2">
+            <button onclick="downloadLetter('pdf')"  class="dlbtn"><span class="material-symbols-outlined text-base">picture_as_pdf</span>Download PDF</button>
+            <button onclick="downloadLetter('txt')"  class="dlbtn"><span class="material-symbols-outlined text-base">text_snippet</span>Download .txt</button>
+            <button onclick="downloadLetter('html')" class="dlbtn"><span class="material-symbols-outlined text-base">code</span>Download HTML</button>
+          </div>
+        </section>
+      </aside>
+
+      <!-- Canvas -->
+      <div class="flex-1 w-full order-1 lg:order-2">
+        <h1 class="font-headline text-5xl md:text-6xl text-c-on mb-12 md:ml-10 leading-tight max-w-xl">Compose your <span class="serif-it text-c-pri">heartbeat</span>.</h1>
+
+        <!-- API config notice -->
+        <div id="api-notice" class="api-alert mb-8 hidden">
+          <strong>⚙️ Backend not connected.</strong> Running in offline mode — letters will download locally but won't be sent via email or WhatsApp.
+          <a href="#" onclick="showPage('setup')" class="underline font-semibold ml-1">Configure backend →</a>
+        </div>
+
+        <div class="relative">
+          <div id="letter-canvas" class="relative paper bg-c-white min-h-[580px] w-full max-w-3xl mx-auto rounded-xl sh-canvas p-10 md:p-16 flex flex-col" style="border-top:3px solid var(--accent)">
+            <div class="mb-2">
+              <label for="f-to" class="sr-only">To (recipient name)</label>
+              <input id="f-to" type="text" class="w-full bg-transparent border-none font-headline text-2xl text-c-on placeholder:text-c-surf-top italic" placeholder="To my dearest…" autocomplete="off"/>
+              <p id="e-to" class="emsg" role="alert">Please enter a recipient's name.</p>
+            </div>
+            <div class="flex-1 flex flex-col mt-6 mb-2">
+              <label for="f-body" class="sr-only">Letter body</label>
+              <textarea id="f-body" class="flex-1 w-full bg-transparent border-none font-body text-lg leading-relaxed text-c-on-v placeholder:text-c-surf-top resize-none min-h-[260px] lined" placeholder="Let the words flow here. Every pause, every breath, every memory…"></textarea>
+              <p id="e-body" class="emsg" role="alert">Please write your message.</p>
+            </div>
+            <div class="mt-10 flex flex-col items-end">
+              <p id="sig-label" class="font-label text-[10px] uppercase tracking-[.3em] text-c-sec mb-2">With all my love,</p>
+              <label for="f-from" class="sr-only">From (your name)</label>
+              <input id="f-from" type="text" class="bg-transparent border-none font-headline text-2xl text-c-on text-right placeholder:text-c-surf-top italic" placeholder="Your Name" autocomplete="off"/>
+              <p id="e-from" class="emsg text-right" role="alert">Please enter your name.</p>
+            </div>
+            <!-- Vellum badge -->
+            <div class="absolute -bottom-6 -right-6 vellum p-5 rounded-xl sh-float hidden md:block border border-white/20">
+              <div class="flex flex-col gap-3">
+                <div class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-c-pri pulse" aria-hidden="true"></div><span class="text-[9px] font-label uppercase tracking-widest text-c-sec">Ready to send</span></div>
+                <button onclick="openPreview()" class="text-[10px] font-label uppercase tracking-widest text-c-sec hover:text-c-pri transition-colors underline underline-offset-4 text-left border-0 bg-transparent cursor-pointer">Preview</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-14 flex flex-col md:flex-row items-center justify-between gap-6 border-t border-c-on/5 pt-10">
+          <div class="flex items-center gap-3 text-c-sec" aria-hidden="true"><span class="material-symbols-outlined text-sm">auto_awesome</span><p class="text-sm italic font-headline">"True love is the only heart's desire."</p></div>
+          <div class="flex items-center gap-6">
+            <button onclick="discardDraft()" class="font-label text-xs uppercase tracking-widest text-c-sec hover:underline decoration-c-pri underline-offset-4 transition-all border-0 bg-transparent cursor-pointer">Discard Draft</button>
+            <button onclick="handleSend()" id="send-btn" class="bg-gradient-to-r from-c-pri to-c-pri-dk text-white rounded-full px-10 py-3.5 font-label font-medium text-xs tracking-[.1em] uppercase shadow-lg active:scale-95 transition-all border-0 cursor-pointer flex items-center gap-2">
+              <span id="send-btn-txt">Send Love</span>
+              <span id="send-spinner" class="hidden material-symbols-outlined text-base spin">progress_activity</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ PAGE: INBOX ═══════ -->
+<div id="page-inbox" class="page" role="main">
+  <div class="max-w-7xl mx-auto px-6 md:px-12 py-16">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+      <div>
+        <p class="font-label text-xs uppercase tracking-[.22em] text-c-sec mb-3">Your Letters</p>
+        <h1 class="font-headline text-5xl text-c-on">Sent Messages</h1>
+      </div>
+      <button data-nav="create" class="bg-gradient-to-r from-c-pri to-c-pri-dk text-white rounded-full px-8 py-3 font-label font-semibold text-xs tracking-widest uppercase sh-float active:scale-95 transition-transform border-0 cursor-pointer self-start md:self-auto">+ New Letter</button>
+    </div>
+
+    <!-- Search + Filter -->
+    <div class="flex flex-col gap-4 mb-10 border-b border-c-out-v/20 pb-8">
+      <!-- Search -->
+      <div class="relative">
+        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-c-sec text-lg pointer-events-none">search</span>
+        <input id="inbox-search" type="search" placeholder="Search by name or contact…"
+          class="w-full bg-c-white border border-c-out-v rounded-full pl-11 pr-5 py-3 font-body text-sm text-c-on focus:border-c-pri transition-colors"
+          aria-label="Search messages"/>
+      </div>
+      <!-- Filters + refresh -->
+      <div class="flex flex-col md:flex-row gap-4">
+        <div class="flex flex-wrap gap-3" role="group" aria-label="Filter by status">
+          <button class="fpill px-5 py-2 rounded-full bg-c-surf-top text-c-on font-label text-xs uppercase tracking-widest" data-ifilter="all" aria-pressed="true">All</button>
+          <button class="fpill px-5 py-2 rounded-full bg-c-surf-low text-c-sec font-label text-xs uppercase tracking-widest" data-ifilter="sent" aria-pressed="false">Sent</button>
+          <button class="fpill px-5 py-2 rounded-full bg-c-surf-low text-c-sec font-label text-xs uppercase tracking-widest" data-ifilter="read" aria-pressed="false">Read</button>
+          <button class="fpill px-5 py-2 rounded-full bg-c-surf-low text-c-sec font-label text-xs uppercase tracking-widest" data-ifilter="failed" aria-pressed="false">Failed</button>
+          <button class="fpill px-5 py-2 rounded-full bg-c-surf-low text-c-sec font-label text-xs uppercase tracking-widest" data-ifilter="scheduled" aria-pressed="false">Scheduled</button>
+          <button class="fpill px-5 py-2 rounded-full bg-c-surf-low text-c-sec font-label text-xs uppercase tracking-widest" data-ifilter="email" aria-pressed="false">Email</button>
+          <button class="fpill px-5 py-2 rounded-full bg-c-surf-low text-c-sec font-label text-xs uppercase tracking-widest" data-ifilter="whatsapp" aria-pressed="false">WhatsApp</button>
+        </div>
+        <div class="md:ml-auto">
+          <button onclick="loadInbox()" class="font-label text-xs uppercase tracking-widest text-c-sec hover:text-c-pri flex items-center gap-2 border-0 bg-transparent cursor-pointer transition-colors">
+            <span class="material-symbols-outlined text-sm">refresh</span> Refresh
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages list -->
+    <div id="inbox-list" class="flex flex-col gap-3">
+      <div class="flex flex-col items-center justify-center py-20 text-c-sec" id="inbox-loading">
+        <span class="material-symbols-outlined text-4xl spin mb-4">progress_activity</span>
+        <p class="font-label text-xs uppercase tracking-widest">Loading messages…</p>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div id="inbox-pagination" class="hidden mt-10 flex items-center justify-between gap-4">
+      <button id="pg-prev" onclick="changePage(-1)" class="flex items-center gap-2 font-label text-xs uppercase tracking-widest text-c-sec hover:text-c-pri border-0 bg-transparent cursor-pointer transition-colors">
+        <span class="material-symbols-outlined text-sm">west</span> Prev
+      </button>
+      <span id="pg-info" class="font-label text-xs text-c-sec uppercase tracking-widest"></span>
+      <button id="pg-next" onclick="changePage(1)" class="flex items-center gap-2 font-label text-xs uppercase tracking-widest text-c-sec hover:text-c-pri border-0 bg-transparent cursor-pointer transition-colors">
+        Next <span class="material-symbols-outlined text-sm">east</span>
+      </button>
+    </div>
+
+    <!-- Empty state -->
+    <div id="inbox-empty" class="hidden flex-col items-center justify-center py-28 text-center">
+      <div class="w-20 h-20 rounded-full bg-c-surf-mid flex items-center justify-center mb-6" aria-hidden="true"><span class="material-symbols-outlined text-c-sec" style="font-size:2.5rem">mail</span></div>
+      <h2 class="font-headline text-3xl text-c-on mb-3">No messages yet</h2>
+      <p class="font-body text-c-on-v max-w-sm text-sm leading-relaxed mb-8">Write your first letter and send it to someone special.</p>
+      <button data-nav="create" class="bg-gradient-to-r from-c-pri to-c-pri-dk text-white rounded-full px-10 py-4 font-label font-bold text-xs uppercase tracking-widest shadow-lg active:scale-95 transition-all border-0 cursor-pointer">Write a Letter</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ PAGE: TEMPLATES ═══════ -->
+<div id="page-templates" class="page" role="main">
+  <div class="max-w-7xl mx-auto px-6 md:px-12 py-16">
+    <div class="mb-20">
+      <p class="font-label text-xs uppercase tracking-[.22em] text-c-sec mb-4 md:ml-16">Curated Collections</p>
+      <h1 class="font-headline text-5xl md:text-7xl text-c-on leading-tight md:ml-16 max-w-2xl">Choose a canvas for your <span class="serif-it">deepest sentiments.</span></h1>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-20 gap-x-10">
+      <div class="flex flex-col gap-5">
+        <div class="relative aspect-[3/4] rounded-xl overflow-hidden bg-c-surf-low p-8 flex items-center justify-center lift cursor-pointer" onclick="applyTemplate('vintage')" aria-label="Use Vintage Romance template">
+          <div class="vellum w-full h-full rounded-lg sh-float p-8 flex flex-col justify-between border border-white/40"><div class="space-y-3"><div class="w-10 h-px bg-c-pri/40"></div><h3 class="font-headline text-2xl text-c-on italic">Dearest,</h3><p class="font-body text-sm leading-relaxed text-c-on-v/80">Every second away from you feels like a season lost...</p></div><div class="text-right"><p class="font-headline text-base italic text-c-sec">Yours always.</p></div></div>
+        </div>
+        <div class="flex justify-between items-end px-1"><div><p class="font-label text-[10px] uppercase tracking-widest text-c-sec mb-1">Traditional</p><h4 class="font-headline text-lg text-c-on">Vintage Romance</h4></div><button class="hbtn text-c-sec" aria-pressed="false" aria-label="Favourite Vintage Romance"><span class="material-symbols-outlined hi">favorite</span></button></div>
+      </div>
+      <div class="flex flex-col gap-5 lg:mt-10">
+        <div class="relative aspect-[3/4] rounded-xl overflow-hidden bg-c-surf-high p-10 flex flex-col justify-center lift cursor-pointer" onclick="applyTemplate('modern')" aria-label="Use Modern Minimalism template">
+          <div class="bg-c-white w-full p-7 rounded sh-float border border-c-out-v/10"><div class="space-y-5"><span class="font-label text-[10px] tracking-widest uppercase text-c-sec">01.01.24</span><p class="font-body text-xl font-light text-c-on leading-snug">You are the <span class="text-c-pri font-medium">only detail</span> that matters.</p></div></div>
+        </div>
+        <div class="flex justify-between items-end px-1"><div><p class="font-label text-[10px] uppercase tracking-widest text-c-sec mb-1">Contemporary</p><h4 class="font-headline text-lg text-c-on">Modern Minimalism</h4></div><button class="hbtn text-c-sec" aria-pressed="false" aria-label="Favourite Modern Minimalism"><span class="material-symbols-outlined hi">favorite</span></button></div>
+      </div>
+      <div class="flex flex-col gap-5">
+        <div class="relative aspect-[3/4] rounded-xl overflow-hidden bg-c-inv p-10 flex items-end lift cursor-pointer" onclick="applyTemplate('midnight')" aria-label="Use Dark Serenade template">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+          <div class="relative z-10 space-y-3 text-white"><span class="material-symbols-outlined text-c-pri-dim">nights_stay</span><h3 class="font-headline text-2xl font-light">Midnight Whispers</h3><p class="font-body text-xs opacity-60 leading-relaxed">For words spoken in the quietest hours.</p></div>
+        </div>
+        <div class="flex justify-between items-end px-1"><div><p class="font-label text-[10px] uppercase tracking-widest text-c-sec mb-1">Sultry</p><h4 class="font-headline text-lg text-c-on">Dark Serenade</h4></div><button class="hbtn text-c-sec" aria-pressed="false" aria-label="Favourite Dark Serenade"><span class="material-symbols-outlined hi">favorite</span></button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ MODAL: PREVIEW ═══════ -->
+<div id="preview-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="prev-title">
+  <div class="bg-c-white rounded-2xl sh-canvas max-w-xl w-full p-10 md:p-14 relative flex flex-col" style="max-height:90vh;overflow-y:auto">
+    <button class="modal-close absolute top-5 right-5 text-c-sec hover:text-c-pri transition-colors border-0 bg-transparent cursor-pointer" data-close="preview" aria-label="Close preview"><span class="material-symbols-outlined">close</span></button>
+    <p class="font-label text-[10px] uppercase tracking-[.22em] text-c-sec mb-6">Letter Preview</p>
+    <!-- Channel badge -->
+    <div id="prev-channel-badge" class="mb-6 flex items-center gap-2 text-xs font-label uppercase tracking-wider"></div>
+    <div class="border border-c-out-v/30 rounded-xl p-8 bg-c-surf-low flex flex-col gap-6 mb-8">
+      <p id="prev-title" class="font-headline text-xl italic text-c-on">To my dearest…</p>
+      <div class="w-8 h-px bg-c-pri/30"></div>
+      <p id="prev-body" class="font-body text-base leading-relaxed text-c-on-v whitespace-pre-wrap min-h-[80px]">…</p>
+      <div class="mt-4 flex flex-col items-end"><p class="font-label text-[10px] uppercase tracking-[.25em] text-c-sec mb-1">With all my love,</p><p id="prev-from" class="font-headline text-xl italic text-c-on">Your Name</p></div>
+    </div>
+    <div class="flex items-center gap-3 mb-4 text-c-sec"><span class="material-symbols-outlined text-sm">music_note</span><span id="prev-song" class="font-label text-xs">No song selected</span></div>
+    <div class="flex items-center gap-3 mb-8 text-c-sec"><span class="material-symbols-outlined text-sm">alternate_email</span><span id="prev-contact" class="font-label text-xs">—</span></div>
+    <div class="flex gap-3 justify-end flex-wrap">
+      <button onclick="downloadLetter('pdf')" class="dlbtn" style="width:auto"><span class="material-symbols-outlined text-sm">download</span>Save PDF</button>
+      <button class="modal-close px-6 py-2.5 rounded-full border border-c-out-v text-c-sec font-label text-xs uppercase tracking-widest hover:bg-c-surf-mid transition-colors bg-transparent cursor-pointer" data-close="preview">Edit</button>
+      <button onclick="handleSend()" class="px-8 py-2.5 rounded-full bg-gradient-to-r from-c-pri to-c-pri-dk text-white font-label text-xs uppercase tracking-widest shadow-md active:scale-95 transition-all border-0 cursor-pointer">Send Love 💌</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ MODAL: SENT ═══════ -->
+<div id="sent-modal" class="modal" style="z-index:300" role="dialog" aria-modal="true" aria-labelledby="sent-h">
+  <div class="bg-c-white rounded-3xl sh-canvas max-w-md w-full p-12 md:p-16 text-center relative overflow-hidden">
+    <div class="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-c-pri/5 pointer-events-none"></div>
+    <div class="absolute -bottom-12 -left-12 w-40 h-40 rounded-full bg-c-sec-ct/30 pointer-events-none"></div>
+    <div class="relative mx-auto mb-8 env-wrap" style="width:120px;height:90px" aria-hidden="true">
+      <svg viewBox="0 0 120 90" xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 w-full h-full">
+        <rect x="2" y="20" width="116" height="68" rx="6" fill="#ffdad6" stroke="#ae1417" stroke-width="2"/>
+        <line x1="2" y1="88" x2="60" y2="50" stroke="#ae1417" stroke-width="1.5" opacity=".4"/>
+        <line x1="118" y1="88" x2="60" y2="50" stroke="#ae1417" stroke-width="1.5" opacity=".4"/>
+      </svg>
+      <div id="env-flap" class="env-flap absolute top-0 left-0 w-full">
+        <svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg" style="width:120px"><polygon points="2,20 60,0 118,20" fill="#ffb4ab" stroke="#ae1417" stroke-width="2"/></svg>
+      </div>
+      <div id="env-letter" class="env-letter absolute left-4 right-4 bg-white rounded text-center p-1" style="top:12px">
+        <p style="font-family:'Noto Serif',serif;font-style:italic;font-size:9px;color:#ae1417;line-height:1.4">With<br/>Love ♥</p>
+      </div>
+    </div>
+    <div id="sent-msg" class="sent-msg">
+      <p class="font-label text-[10px] uppercase tracking-[.25em] text-c-sec mb-3">Your message is flying</p>
+      <h2 id="sent-h" class="font-headline text-3xl text-c-on mb-1">Sent with love</h2>
+      <p class="font-headline text-base italic text-c-sec mb-4" id="sent-recip"></p>
+      <p id="sent-channel-info" class="font-body text-sm text-c-on-v mb-4"></p>
+      <p id="sent-view-link" class="font-body text-xs text-c-sec mb-8 break-all"></p>
+      <button onclick="closeSentAndReset()" class="bg-gradient-to-r from-c-pri to-c-pri-dk text-white rounded-full px-10 py-3.5 font-label font-medium text-xs uppercase tracking-widest shadow-lg active:scale-95 transition-all border-0 cursor-pointer">View Inbox ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ MODAL: MESSAGE DETAIL ═══════ -->
+<div id="detail-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+  <div class="bg-c-white rounded-2xl sh-canvas max-w-lg w-full p-10 relative flex flex-col" style="max-height:90vh;overflow-y:auto">
+    <button class="modal-close absolute top-5 right-5 text-c-sec hover:text-c-pri transition-colors border-0 bg-transparent cursor-pointer" data-close="detail" aria-label="Close"><span class="material-symbols-outlined">close</span></button>
+    <p class="font-label text-[10px] uppercase tracking-[.22em] text-c-sec mb-6">Message Detail</p>
+    <div id="detail-content" class="space-y-5"></div>
+    <div class="flex gap-3 mt-8 pt-6 border-t border-c-out-v/20 flex-wrap">
+      <a id="detail-view-link" href="#" target="_blank" rel="noopener" class="flex-1 text-center py-2.5 rounded-full border border-c-pri text-c-pri font-label text-xs uppercase tracking-widest hover:bg-c-pri-lt transition-colors min-w-[120px]">Open Letter ↗</a>
+      <button id="detail-resend-btn" class="hidden py-2.5 px-5 rounded-full font-label text-xs uppercase tracking-widest border-0 cursor-pointer transition-colors" style="background:#fef9c3;color:#854d0e" aria-label="Resend this failed message">↺ Resend</button>
+      <button id="detail-delete-btn" class="py-2.5 px-5 rounded-full border border-red-200 text-red-500 font-label text-xs uppercase tracking-widest hover:bg-red-50 transition-colors bg-transparent cursor-pointer">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ TOAST ═══════ -->
+<div id="toast" role="status" aria-live="polite" aria-atomic="true" class="fixed bottom-8 left-1/2 z-[400] pointer-events-none" style="transform:translateX(-50%) translateY(8px);opacity:0;transition:opacity .3s,transform .3s">
+  <div id="toast-txt" class="bg-c-inv text-c-inv-on px-7 py-3.5 rounded-full font-label text-xs uppercase tracking-widest shadow-2xl whitespace-nowrap"></div>
+</div>
+
+<!-- ═══════ PAGE: SETTINGS ═══════ -->
+<div id="page-settings" class="page" role="main">
+  <div class="max-w-3xl mx-auto px-6 md:px-12 py-16">
+    <div class="mb-12">
+      <p class="font-label text-xs uppercase tracking-[.22em] text-c-sec mb-3">Configuration</p>
+      <h1 class="font-headline text-4xl text-c-on">Settings</h1>
+      <p class="font-body text-c-on-v text-sm mt-3 leading-relaxed">Configure your email and WhatsApp credentials. These are saved to the database and override your <code>.env</code> file at runtime.</p>
+    </div>
+
+    <!-- Status banner -->
+    <div id="settings-status" class="hidden mb-8 rounded-xl px-5 py-4 font-body text-sm font-medium" role="status"></div>
+
+    <!-- Email Config -->
+    <section class="bg-c-white rounded-2xl sh-float p-8 mb-6 border border-c-out-v/20" aria-labelledby="email-settings-heading">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-full bg-c-pri-lt flex items-center justify-center"><span class="material-symbols-outlined text-c-pri text-lg">mail</span></div>
+        <div><h2 id="email-settings-heading" class="font-headline text-xl">Email (SMTP)</h2><p class="font-body text-xs text-c-sec mt-0.5">Gmail recommended — use an App Password, not your login password</p></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label for="cfg-email-user" class="font-label text-[10px] uppercase tracking-widest text-c-sec mb-2 block">Email Address</label>
+          <input id="cfg-email-user" type="email" placeholder="you@gmail.com" class="w-full border border-c-out-v rounded-xl px-4 py-3 font-body text-sm text-c-on focus:border-c-pri transition-colors bg-c-bg"/>
+        </div>
+        <div>
+          <label for="cfg-email-pass" class="font-label text-[10px] uppercase tracking-widest text-c-sec mb-2 block">App Password</label>
+          <input id="cfg-email-pass" type="password" placeholder="xxxx xxxx xxxx xxxx" class="w-full border border-c-out-v rounded-xl px-4 py-3 font-body text-sm text-c-on focus:border-c-pri transition-colors bg-c-bg"/>
+        </div>
+        <div>
+          <label for="cfg-email-host" class="font-label text-[10px] uppercase tracking-widest text-c-sec mb-2 block">SMTP Host</label>
+          <input id="cfg-email-host" type="text" value="smtp.gmail.com" class="w-full border border-c-out-v rounded-xl px-4 py-3 font-body text-sm text-c-on focus:border-c-pri transition-colors bg-c-bg"/>
+        </div>
+        <div>
+          <label for="cfg-email-port" class="font-label text-[10px] uppercase tracking-widest text-c-sec mb-2 block">SMTP Port</label>
+          <input id="cfg-email-port" type="number" value="587" class="w-full border border-c-out-v rounded-xl px-4 py-3 font-body text-sm text-c-on focus:border-c-pri transition-colors bg-c-bg"/>
+        </div>
+        <div class="md:col-span-2">
+          <label for="cfg-email-from" class="font-label text-[10px] uppercase tracking-widest text-c-sec mb-2 block">From Name &amp; Address</label>
+          <input id="cfg-email-from" type="text" placeholder='The Editorial Muse <you@gmail.com>' class="w-full border border-c-out-v rounded-xl px-4 py-3 font-body text-sm text-c-on focus:border-c-pri transition-colors bg-c-bg"/>
+        </div>
+      </div>
+      <!-- Test email -->
+      <div class="mt-5 pt-5 border-t border-c-out-v/20 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+        <div class="flex-1">
+          <label for="test-email-to" class="font-label text-[10px] uppercase tracking-widest text-c-sec mb-2 block">Send test to</label>
+          <input id="test-email-to" type="email" placeholder="test@example.com" class="w-full border border-c-out-v rounded-xl px-4 py-2.5 font-body text-sm text-c-on focus:border-c-pri transition-colors bg-c-bg"/>
+        </div>
+        <button onclick="testEmail()" class="flex items-center gap-2 px-6 py-2.5 rounded-full border border-c-pri text-c-pri font-label text-xs uppercase tracking-widest hover:bg-c-pri-lt transition-colors border-solid bg-transparent cursor-pointer mt-5 sm:mt-0 whitespace-nowrap">
+          <span class="material-symbols-outlined text-sm">send</span> Send Test
+        </button>
+      </div>
+    </section>
+
+    <!-- WhatsApp Config -->
+    <section class="bg-c-white rounded-2xl sh-float p-8 mb-6 border border-c-out-v/20" aria-labelledby="wa-settings-heading">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background:#dcf8c6">
+          <svg width="20" height="20" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#25d366"/><path d="M16 7.5C11.3 7.5 7.5 11.3 7.5 16c0 1.5.4 3 1.1 4.2L7.5 24.5l4.4-1.1c1.2.6 2.6 1 4.1 1 4.7 0 8.5-3.8 8.5-8.5S20.7 7.5 16 7.5zm4.9 11.8c-.2.6-1.2 1.1-1.6 1.2-.4.1-.9.1-2.9-.6-2.5-1-4-3.5-4.1-3.7-.1-.2-1-1.3-1-2.4 0-1.1.6-1.7.8-1.9.2-.2.5-.3.7-.3h.5c.2 0 .4.1.5.4.2.4.8 2 .8 2.1.1.1.1.3 0 .4-.1.1-.1.2-.2.3l-.3.3c-.1.1-.2.2-.1.4.1.2.5.8 1.1 1.3.8.7 1.4.9 1.6 1 .2.1.4 0 .5-.1l.4-.5c.1-.2.3-.2.5-.1l1.5.7c.2.1.4.2.4.4.1.2 0 .9-.1 1.1z" fill="white"/></svg>
+        </div>
+        <div><h2 id="wa-settings-heading" class="font-headline text-xl">WhatsApp (Twilio)</h2><p class="font-body text-xs text-c-sec mt-0.5">Free sandbox at twilio.com — recipient must join sandbox once</p></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label for="cfg-twilio-sid" class="font-label text-[10px] uppercase tracking-widest text-c-sec mb-2 block">Account SID</label>
+          <input id="cfg-twilio-sid" type="text" placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" class="w-full border border-c-out-v rounded-xl px-4 py-3 font-body text-sm font-mono text-c-on focus:border-c-pri transition-colors bg-c-bg"/>
+        </div>
+        <div>
+          <label for="cfg-twilio-token" class="font-label text-[10px] uppercase tracking-widest text-c-sec mb-2 block">Auth Token</label>
+          <input id="cfg-twilio-token" type="password" placeholder="your_auth_token" class="w-full border border-c-out-v rounded-xl px-4 py-3 font-body text-sm text-c-on focus:border-c-pri transition-colors bg-c-bg"/>
+        </div>
+        <div class="md:col-span-2">
+          <label for="cfg-twilio-from" class="font-label text-[10px] uppercase tracking-widest text-c-sec mb-2 block">WhatsApp From Number</label>
+          <input id="cfg-twilio-from" type="text" placeholder="whatsapp:+14155238886" class="w-full border border-c-out-v rounded-xl px-4 py-3 font-body text-sm font-mono text-c-on focus:border-c-pri transition-colors bg-c-bg"/>
+        </div>
+      </div>
+      <div class="mt-5 pt-5 border-t border-c-out-v/20 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+        <div class="flex-1">
+          <label for="test-wa-to" class="font-label text-[10px] uppercase tracking-widest text-c-sec mb-2 block">Send test to (E.164 format)</label>
+          <input id="test-wa-to" type="tel" placeholder="+2348012345678" class="w-full border border-c-out-v rounded-xl px-4 py-2.5 font-body text-sm text-c-on focus:border-c-pri transition-colors bg-c-bg"/>
+        </div>
+        <button onclick="testWhatsApp()" class="flex items-center gap-2 px-6 py-2.5 rounded-full font-label text-xs uppercase tracking-widest hover:opacity-80 transition-opacity border-0 cursor-pointer mt-5 sm:mt-0 whitespace-nowrap" style="background:#25d366;color:#fff">
+          <span class="material-symbols-outlined text-sm">send</span> Send Test
+        </button>
+      </div>
+    </section>
+
+    <!-- App URL -->
+    <section class="bg-c-white rounded-2xl sh-float p-8 mb-8 border border-c-out-v/20" aria-labelledby="app-settings-heading">
+      <h2 id="app-settings-heading" class="font-headline text-xl mb-4">App URL</h2>
+      <p class="font-body text-xs text-c-sec mb-4">Used to generate the share link included in each sent message. Set this to your deployed domain.</p>
+      <input id="cfg-app-url" type="url" placeholder="https://your-app.onrender.com" class="w-full border border-c-out-v rounded-xl px-4 py-3 font-body text-sm text-c-on focus:border-c-pri transition-colors bg-c-bg"/>
+    </section>
+
+    <!-- Save button -->
+    <button onclick="saveSettings()" id="settings-save-btn" class="bg-gradient-to-r from-c-pri to-c-pri-dk text-white rounded-full px-12 py-4 font-label font-bold text-xs uppercase tracking-widest shadow-lg active:scale-95 transition-all border-0 cursor-pointer flex items-center gap-2">
+      <span class="material-symbols-outlined text-base">save</span>
+      <span id="settings-save-txt">Save Settings</span>
+    </button>
+  </div>
+</div>
+
+<!-- ═══════ FOOTER ═══════ -->
+<footer class="border-t border-c-on/8 bg-c-bg mt-16">
+  <div class="max-w-7xl mx-auto px-6 md:px-12 py-12 flex flex-col md:flex-row justify-between items-center gap-6">
+    <span class="font-headline italic text-c-sec">The Editorial Muse</span>
+    <nav class="flex gap-8"><a href="#" class="font-label text-[11px] uppercase tracking-widest text-c-sec hover:underline decoration-c-pri underline-offset-4">Instagram</a><a href="#" class="font-label text-[11px] uppercase tracking-widest text-c-sec hover:underline decoration-c-pri underline-offset-4">Privacy</a></nav>
+    <p class="font-label text-[11px] uppercase tracking-widest text-c-sec/50">© 2024 The Editorial Muse.</p>
+  </div>
+</footer>
+
+<script>
+'use strict';
+
+/* ══════════════════════════════════════
+   CONFIG
+══════════════════════════════════════ */
+const API_BASE = window.location.origin + '/api';
+
+/* ══════════════════════════════════════
+   STATE
+══════════════════════════════════════ */
+const S = {
+  page: null, song: null, channel: 'email', accent: '#ae1417', font: 'serif',
+  musicPlaying:false, audioCtx:null, nodes:[], ticker:null, toastTimer:null,
+  modalOpen:null, fmt:{bold:false,italic:false,center:false},
+  inboxMessages:[], inboxFilter:'all', inboxSearch:'', inboxPage:1, inboxTotalPages:1,
+  backendOnline:false,
+};
+
+/* ══════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════ */
+const PAGES = ['home','create','inbox','templates','settings'];
+
+function showPage(id) {
+  if (!PAGES.includes(id) || S.page === id) return;
+  if (S.page) {
+    const prev = document.getElementById('page-' + S.page);
+    prev.classList.remove('visible');
+    prev.addEventListener('transitionend', function h(){ prev.removeEventListener('transitionend',h); prev.classList.remove('show'); }, {once:true});
+  }
+  S.page = id;
+  const next = document.getElementById('page-' + id);
+  next.classList.add('show');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>next.classList.add('visible')));
+  PAGES.forEach(p=>{ const b=document.getElementById('nav-'+p); if(b) b.setAttribute('aria-current', p===id?'page':'false'); });
+  window.scrollTo({top:0,behavior:'smooth'});
+  if (id === 'inbox')    { S.inboxPage=1; loadInbox(); }
+  if (id === 'home')     loadStats();
+  if (id === 'settings') loadSettings();
+}
+
+/* ══════════════════════════════════════
+   GLOBAL DELEGATION
+══════════════════════════════════════ */
+document.addEventListener('click', e => {
+  const nav   = e.target.closest('[data-nav]');     if (nav)   { e.preventDefault(); showPage(nav.dataset.nav); return; }
+  const close = e.target.closest('[data-close]');   if (close) { closeModal(close.dataset.close); return; }
+  const modal = e.target.closest('.modal');         if (modal && e.target===modal && modal.id!=='sent-modal') { closeModal(modal.id.replace('-modal','')); return; }
+  const pill  = e.target.closest('.fpill');         if (pill)  { applyInboxFilter(pill); return; }
+  const heart = e.target.closest('.hbtn');          if (heart) { toggleLike(heart); return; }
+  const sw    = e.target.closest('.swatch');        if (sw)    { selectSwatch(sw); return; }
+  const song  = e.target.closest('.song');          if (song)  { selectSong(song); return; }
+});
+document.addEventListener('keydown', e => {
+  if ((e.key==='Enter'||e.key===' ') && e.target.closest('.song')) { e.preventDefault(); selectSong(e.target.closest('.song')); }
+  if (e.key==='Escape' && S.modalOpen) closeModal(S.modalOpen);
+});
+
+/* ══════════════════════════════════════
+   TOAST
+══════════════════════════════════════ */
+function toast(msg) {
+  clearTimeout(S.toastTimer);
+  const el = document.getElementById('toast');
+  document.getElementById('toast-txt').textContent = msg;
+  el.style.opacity=1; el.style.transform='translateX(-50%) translateY(0)';
+  S.toastTimer=setTimeout(()=>{ el.style.opacity=0; el.style.transform='translateX(-50%) translateY(8px)'; }, 2800);
+}
+
+/* ══════════════════════════════════════
+   MODAL SYSTEM
+══════════════════════════════════════ */
+function openModal(id) {
+  const el = document.getElementById(id+'-modal'); if(!el) return;
+  S.modalOpen = id; el.style.display='flex';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('open')));
+  const first = el.querySelector('button,[tabindex="0"],input');
+  if(first) setTimeout(()=>first.focus(),50);
+}
+function closeModal(id) {
+  const el = document.getElementById(id+'-modal'); if(!el) return;
+  el.classList.remove('open'); el.classList.add('closing');
+  el.addEventListener('transitionend', function h(){ el.removeEventListener('transitionend',h); el.classList.remove('closing'); el.style.display='none'; if(S.modalOpen===id) S.modalOpen=null; }, {once:true});
+}
+
+/* ══════════════════════════════════════
+   CHANNEL SELECTION
+══════════════════════════════════════ */
+function selectChannel(ch) {
+  S.channel = ch;
+  document.getElementById('ch-email').classList.toggle('selected-email', ch==='email');
+  document.getElementById('ch-email').setAttribute('aria-pressed', ch==='email');
+  document.getElementById('ch-wa').classList.toggle('selected-wa', ch==='whatsapp');
+  document.getElementById('ch-wa').setAttribute('aria-pressed', ch==='whatsapp');
+  // Update contact field
+  const label = document.getElementById('contact-label');
+  const input = document.getElementById('f-contact');
+  if (ch === 'email') {
+    label.textContent = 'Recipient Email';
+    input.type = 'email'; input.placeholder = 'their@email.com';
+  } else {
+    label.textContent = 'Recipient WhatsApp Number';
+    input.type = 'tel'; input.placeholder = '+234 801 234 5678';
+  }
+}
+
+/* ══════════════════════════════════════
+   MUSIC
+══════════════════════════════════════ */
+const SONGS=[
+  {name:'Moonlight Sonata',notes:[261.6,311.1,392,311.1,261.6,311.1,392,311.1,246.9,311.1,392,311.1],tempo:420,wave:'sine',gain:.16},
+  {name:'At Last',notes:[349.2,392,440,523.2,493.8,440,392,349.2,329.6,293.6,349.2,392],tempo:520,wave:'triangle',gain:.18},
+  {name:'First Day',notes:[293.6,329.6,349.2,392,440,392,349.2,329.6,293.6,261.6,293.6,329.6],tempo:380,wave:'sine',gain:.14},
+];
+function getCtx(){ if(!S.audioCtx) S.audioCtx=new(window.AudioContext||window.webkitAudioContext)(); if(S.audioCtx.state==='suspended') S.audioCtx.resume(); return S.audioCtx; }
+function stopMusic(){ clearInterval(S.ticker); S.nodes.forEach(n=>{try{n.stop(0)}catch(_){}}); S.nodes=[]; S.musicPlaying=false; }
+function playMelody(idx){ stopMusic(); const ctx=getCtx(),sg=SONGS[idx]; let ni=0; function tick(){ const o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g);g.connect(ctx.destination); o.type=sg.wave; o.frequency.setValueAtTime(sg.notes[ni%sg.notes.length],ctx.currentTime); g.gain.setValueAtTime(0,ctx.currentTime); g.gain.linearRampToValueAtTime(sg.gain,ctx.currentTime+.05); g.gain.linearRampToValueAtTime(0,ctx.currentTime+(sg.tempo/1000)*.82); o.start(ctx.currentTime);o.stop(ctx.currentTime+sg.tempo/1000); S.nodes.push(o);ni++; } tick(); S.ticker=setInterval(tick,sg.tempo); S.musicPlaying=true; }
+function selectSong(el){ const idx=parseInt(el.dataset.song,10); const all=document.querySelectorAll('.song'); if(S.song===idx&&S.musicPlaying){stopMusic();S.song=null;setSongUI(el,false);toast('⏸ Paused');return;} all.forEach(s=>setSongUI(s,false)); S.song=idx; setSongUI(el,true); playMelody(idx); toast('♪ Now playing: '+SONGS[idx].name); }
+function setSongUI(el,active){ const ic=el.querySelector('.sicon'); el.setAttribute('aria-selected',active?'true':'false'); if(active){el.classList.add('playing');ic.textContent='pause_circle';ic.style.color='var(--c-pri)';ic.style.fontVariationSettings="'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24";if(!el.querySelector('.eq-dot')){const eq=document.createElement('span');eq.className='eq-dot material-symbols-outlined text-sm ml-auto';eq.textContent='graphic_eq';eq.style.color='var(--c-pri)';el.appendChild(eq);}}else{el.classList.remove('playing');ic.textContent='play_circle';ic.style.color='';ic.style.fontVariationSettings="'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24";const eq=el.querySelector('.eq-dot');if(eq)eq.remove();} }
+
+/* ══════════════════════════════════════
+   SWATCH
+══════════════════════════════════════ */
+function selectSwatch(btn){ const color=btn.dataset.swatch; document.querySelectorAll('.swatch').forEach(s=>s.setAttribute('aria-checked','false')); btn.setAttribute('aria-checked','true'); S.accent=color; document.documentElement.style.setProperty('--accent',color); const canvas=document.getElementById('letter-canvas'); if(canvas) canvas.style.borderTop=`3px solid ${color}`; const sig=document.getElementById('sig-label'); if(sig) sig.style.color=color; }
+
+/* ══════════════════════════════════════
+   TYPOGRAPHY
+══════════════════════════════════════ */
+function setFont(t){ S.font=t; document.getElementById('f-body').style.fontFamily=t==='serif'?"'Noto Serif',serif":"'Manrope',sans-serif"; }
+function toggleFmt(t){ S.fmt[t]=!S.fmt[t]; const on=S.fmt[t]; const idMap={bold:'btn-bold',italic:'btn-italic',center:'btn-center'}; document.getElementById(idMap[t]).setAttribute('aria-pressed',on?'true':'false'); const ta=document.getElementById('f-body'); if(t==='bold') ta.style.fontWeight=on?'bold':''; if(t==='italic') ta.style.fontStyle=on?'italic':''; if(t==='center') ta.style.textAlign=on?'center':''; }
+
+/* ══════════════════════════════════════
+   VALIDATION
+══════════════════════════════════════ */
+function validate() {
+  const contact = document.getElementById('f-contact').value.trim();
+  const fields = [
+    {fid:'f-to',   eid:'e-to',   val:document.getElementById('f-to').value.trim()},
+    {fid:'f-body', eid:'e-body', val:document.getElementById('f-body').value.trim()},
+    {fid:'f-from', eid:'e-from', val:document.getElementById('f-from').value.trim()},
+    {fid:'f-contact', eid:'e-contact', val:contact},
+  ];
+  let ok=true;
+  fields.forEach(({fid,eid,val})=>{
+    const f=document.getElementById(fid), e=document.getElementById(eid);
+    if(!val){f.classList.add('ferr');e.classList.add('on');ok=false;}
+    else{f.classList.remove('ferr');e.classList.remove('on');}
+  });
+  // Extra email validation
+  if (S.channel==='email' && contact && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact)) {
+    document.getElementById('f-contact').classList.add('ferr');
+    document.getElementById('e-contact').textContent='Please enter a valid email address.';
+    document.getElementById('e-contact').classList.add('on'); ok=false;
+  }
+  if(!ok) toast('Please fill all fields ✍️');
+  return ok;
+}
+['f-to','f-body','f-from','f-contact'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(!el) return;
+  const em={'f-to':'e-to','f-body':'e-body','f-from':'e-from','f-contact':'e-contact'};
+  el.addEventListener('input',()=>{ el.classList.remove('ferr'); document.getElementById(em[id])?.classList.remove('on'); });
+});
+
+/* ══════════════════════════════════════
+   PREVIEW
+══════════════════════════════════════ */
+function openPreview(){
+  const to=document.getElementById('f-to').value||'My Dearest', body=document.getElementById('f-body').value||'…', from=document.getElementById('f-from').value||'Your Name', contact=document.getElementById('f-contact').value||'—', bs=document.getElementById('f-body').style;
+  document.getElementById('prev-title').textContent=to;
+  const pb=document.getElementById('prev-body'); pb.textContent=body; pb.style.fontFamily=bs.fontFamily||''; pb.style.fontWeight=bs.fontWeight||''; pb.style.fontStyle=bs.fontStyle||''; pb.style.textAlign=bs.textAlign||'';
+  document.getElementById('prev-from').textContent=from;
+  document.getElementById('prev-song').textContent=S.song!==null?'♪ '+SONGS[S.song].name:'No song selected';
+  document.getElementById('prev-contact').textContent=contact;
+  const badge=document.getElementById('prev-channel-badge');
+  if(S.channel==='email'){badge.innerHTML='<span class="material-symbols-outlined text-c-pri text-sm">mail</span><span class="text-c-pri font-semibold">Sending via Email</span>';}
+  else{badge.innerHTML='<span style="color:#25d366;font-weight:700;font-size:.75rem;letter-spacing:.06em">● WhatsApp</span>';}
+  openModal('preview');
+}
+
+/* ══════════════════════════════════════
+   API — CHECK BACKEND
+══════════════════════════════════════ */
+async function checkBackend(){
+  try {
+    const r = await fetch(API_BASE+'/stats',{signal:AbortSignal.timeout(2000)});
+    S.backendOnline = r.ok;
+  } catch(_) { S.backendOnline = false; }
+  const notice = document.getElementById('api-notice');
+  if (notice) notice.classList.toggle('hidden', S.backendOnline);
+  return S.backendOnline;
+}
+
+/* ══════════════════════════════════════
+   SEND FLOW
+══════════════════════════════════════ */
+async function handleSend(){
+  if(!validate()) return;
+  if(S.modalOpen==='preview'){ closeModal('preview'); setTimeout(doSend,340); }
+  else doSend();
+}
+
+async function doSend(){
+  const btn=document.getElementById('send-btn'), txt=document.getElementById('send-btn-txt'), spinner=document.getElementById('send-spinner');
+  btn.disabled=true; txt.textContent='Sending…'; spinner.classList.remove('hidden');
+
+  const schedField = document.getElementById('f-schedule');
+  const scheduledAt = schedField?.value ? new Date(schedField.value).toISOString() : null;
+
+  const payload = {
+    to_name:    document.getElementById('f-to').value.trim(),
+    to_contact: document.getElementById('f-contact').value.trim(),
+    from_name:  document.getElementById('f-from').value.trim(),
+    body:       document.getElementById('f-body').value.trim(),
+    song:       S.song!==null ? SONGS[S.song].name : null,
+    accent:     S.accent,
+    font:       S.font,
+    channel:    S.channel,
+    ...(scheduledAt && { scheduled_at: scheduledAt }),
+  };
+
+  let viewUrl = null;
+  let isScheduled = false;
+
+  if (S.backendOnline) {
+    try {
+      const res = await fetch(API_BASE+'/send', {
+        method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || 'Send failed');
+      viewUrl = data.view_url;
+      isScheduled = data.status === 'scheduled';
+    } catch(e) {
+      btn.disabled=false; txt.textContent='Send Love'; spinner.classList.add('hidden');
+      toast('❌ ' + e.message); return;
+    }
+  } else {
+    await new Promise(r=>setTimeout(r,800));
+  }
+
+  btn.disabled=false; txt.textContent='Send Love'; spinner.classList.add('hidden');
+  if (schedField) schedField.value = '';
+  openSentFlow(payload.to_name, viewUrl, isScheduled);
+}
+
+function openSentFlow(toName, viewUrl, isScheduled=false){
+  document.getElementById('sent-recip').textContent = toName ? 'to '+toName : '';
+  const chInfo = document.getElementById('sent-channel-info');
+  if (isScheduled) {
+    chInfo.textContent = '⏰ Your letter is scheduled and will be delivered automatically.';
+  } else {
+    chInfo.textContent = S.channel==='email'
+      ? '💌 A beautiful letter has landed in their inbox.'
+      : '💬 Your message was delivered to their WhatsApp.';
+  }
+  const linkEl = document.getElementById('sent-view-link');
+  if (viewUrl && !isScheduled) { linkEl.textContent='🔗 '+viewUrl; linkEl.style.display='block'; }
+  else linkEl.style.display='none';
+  resetEnvelope(); openModal('sent');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    document.getElementById('env-flap').classList.add('open');
+    document.getElementById('env-letter').classList.add('rise');
+    document.getElementById('sent-msg').classList.add('show');
+  }));
+}
+
+function resetEnvelope(){ ['env-flap','env-letter','sent-msg'].forEach(id=>document.getElementById(id).classList.remove('open','rise','show')); }
+
+function closeSentAndReset(){
+  closeModal('sent');
+  setTimeout(()=>{
+    resetEnvelope();
+    ['f-to','f-body','f-from','f-contact'].forEach(id=>document.getElementById(id).value='');
+    ['e-to','e-body','e-from','e-contact'].forEach(id=>document.getElementById(id).classList.remove('on'));
+    ['f-to','f-body','f-from','f-contact'].forEach(id=>document.getElementById(id).classList.remove('ferr'));
+    stopMusic(); S.song=null; document.querySelectorAll('.song').forEach(s=>setSongUI(s,false));
+    showPage('inbox');
+  },360);
+}
+
+function discardDraft(){ if(!document.getElementById('f-body').value.trim()){toast('Nothing to discard yet.');return;} if(!confirm('Discard this draft?')) return; ['f-to','f-body','f-from','f-contact'].forEach(id=>document.getElementById(id).value=''); toast('Draft discarded.'); }
+
+/* ══════════════════════════════════════
+   INBOX — load, search, filter, paginate
+══════════════════════════════════════ */
+let _searchDebounce = null;
+
+async function loadInbox(resetPage=true){
+  if(resetPage) S.inboxPage = 1;
+  const list  = document.getElementById('inbox-list');
+  const empty = document.getElementById('inbox-empty');
+  const pgBar = document.getElementById('inbox-pagination');
+
+  list.innerHTML = `<div class="flex flex-col items-center py-20 text-c-sec"><span class="material-symbols-outlined text-4xl spin mb-4">progress_activity</span><p class="font-label text-xs uppercase tracking-widest">Loading messages…</p></div>`;
+  empty.style.display='none'; empty.classList.add('hidden');
+  pgBar.classList.add('hidden');
+
+  if (!S.backendOnline) {
+    list.innerHTML = `<div class="flex flex-col items-center py-20 text-c-sec gap-3"><span class="material-symbols-outlined text-3xl">cloud_off</span><p class="font-label text-xs uppercase tracking-widest">Backend not connected</p><p class="font-body text-xs text-c-on-v">Start the server, then refresh.</p></div>`;
+    return;
+  }
+
+  try {
+    const filter  = S.inboxFilter;
+    const search  = S.inboxSearch;
+    const page    = S.inboxPage;
+    const limit   = 10;
+
+    // Determine if filter is a status or channel
+    const isChannel  = ['email','whatsapp'].includes(filter);
+    const isStatus   = ['sent','read','failed','draft','scheduled'].includes(filter);
+    const params = new URLSearchParams({ page, limit });
+    if (isStatus)  params.set('status',  filter);
+    if (isChannel) params.set('channel', filter);
+    if (search)    params.set('q', search);
+
+    const res  = await fetch(`${API_BASE}/messages?${params}`);
+    const data = await res.json();
+    const messages = data.messages || [];
+    const pagination = data.pagination || { total:0, page:1, pages:1, limit };
+
+    S.inboxMessages    = messages;
+    S.inboxTotalPages  = pagination.pages;
+
+    renderInboxList(messages, pagination, empty, list, pgBar);
+  } catch(e) {
+    list.innerHTML = `<div class="flex flex-col items-center py-20 text-c-sec"><p class="font-body text-sm text-red-500">Error: ${esc(e.message)}</p></div>`;
+  }
+}
+
+function renderInboxList(messages, pagination, empty, list, pgBar) {
+  if (messages.length === 0) {
+    list.innerHTML = '';
+    empty.classList.remove('hidden'); empty.style.display = 'flex';
+    pgBar.classList.add('hidden');
+    return;
+  }
+
+  empty.classList.add('hidden'); empty.style.display = 'none';
+
+  const statusBadges = {
+    sent:      '<span class="status-badge badge-sent">Sent</span>',
+    read:      '<span class="status-badge badge-read">✓ Read</span>',
+    failed:    '<span class="status-badge badge-failed">Failed</span>',
+    draft:     '<span class="status-badge badge-draft">Draft</span>',
+    scheduled: '<span class="status-badge" style="background:#fef9c3;color:#854d0e">⏰ Scheduled</span>',
+  };
+
+  list.innerHTML = messages.map(m => {
+    const badge = statusBadges[m.status] || `<span class="status-badge badge-draft">${esc(m.status)}</span>`;
+    const chIcon = m.channel === 'whatsapp'
+      ? `<svg width="18" height="18" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="#25d366"/><path d="M16 7.5C11.3 7.5 7.5 11.3 7.5 16c0 1.5.4 3 1.1 4.2L7.5 24.5l4.4-1.1c1.2.6 2.6 1 4.1 1 4.7 0 8.5-3.8 8.5-8.5S20.7 7.5 16 7.5zm4.9 11.8c-.2.6-1.2 1.1-1.6 1.2-.4.1-.9.1-2.9-.6-2.5-1-4-3.5-4.1-3.7-.1-.2-1-1.3-1-2.4 0-1.1.6-1.7.8-1.9.2-.2.5-.3.7-.3h.5c.2 0 .4.1.5.4.2.4.8 2 .8 2.1.1.1.1.3 0 .4-.1.1-.1.2-.2.3l-.3.3c-.1.1-.2.2-.1.4.1.2.5.8 1.1 1.3.8.7 1.4.9 1.6 1 .2.1.4 0 .5-.1l.4-.5c.1-.2.3-.2.5-.1l1.5.7c.2.1.4.2.4.4.1.2 0 .9-.1 1.1z" fill="white"/></svg>`
+      : '<span class="material-symbols-outlined text-c-sec" style="font-size:1rem">mail</span>';
+    const date  = new Date(m.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    const views = m.view_count > 0
+      ? `<span class="flex items-center gap-1 text-[10px] text-c-sec"><span class="material-symbols-outlined" style="font-size:.85rem">visibility</span>${m.view_count}</span>` : '';
+    const retryWarn = m.retry_count > 0
+      ? `<span class="text-[10px] text-red-400">retry ×${m.retry_count}</span>` : '';
+    const schedInfo = m.status==='scheduled' && m.scheduled_at
+      ? `<span class="text-[10px] text-amber-600">📅 ${new Date(m.scheduled_at).toLocaleString()}</span>` : '';
+
+    return `<div class="msg-row bg-c-white rounded-2xl p-5 md:p-6 flex items-center gap-4 border border-c-out-v/20"
+      onclick="openDetail('${m.id}')" role="button" tabindex="0"
+      aria-label="Open message to ${esc(m.to_name)}, status: ${esc(m.status)}">
+      <div class="w-10 h-10 rounded-full flex items-center justify-center sh-float flex-shrink-0"
+        style="background:${m.accent||'#ae1417'}18">${chIcon}</div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2 flex-wrap mb-1">
+          <p class="font-headline text-base text-c-on truncate max-w-[180px]">To ${esc(m.to_name)}</p>
+          ${badge} ${views} ${retryWarn}
+        </div>
+        <div class="flex items-center gap-3 flex-wrap">
+          <p class="font-body text-xs text-c-on-v">${esc(m.from_name)} · ${date}</p>
+          ${schedInfo}
+        </div>
+      </div>
+      <span class="material-symbols-outlined text-c-sec text-sm hidden md:block flex-shrink-0">chevron_right</span>
+    </div>`;
+  }).join('');
+
+  // Keyboard support
+  list.querySelectorAll('[role="button"]').forEach(el => {
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); }
+    });
+  });
+
+  // Pagination bar
+  if (pagination.pages > 1) {
+    pgBar.classList.remove('hidden');
+    document.getElementById('pg-info').textContent =
+      `Page ${pagination.page} of ${pagination.pages} · ${pagination.total} total`;
+    document.getElementById('pg-prev').disabled = pagination.page <= 1;
+    document.getElementById('pg-next').disabled = pagination.page >= pagination.pages;
+  } else {
+    pgBar.classList.add('hidden');
+  }
+}
+
+function changePage(delta) {
+  const newPage = S.inboxPage + delta;
+  if (newPage < 1 || newPage > S.inboxTotalPages) return;
+  S.inboxPage = newPage;
+  loadInbox(false);
+  document.getElementById('page-inbox').scrollTo({ top:0, behavior:'smooth' });
+}
+
+function applyInboxFilter(pill) {
+  const f = pill.dataset.ifilter;
+  document.querySelectorAll('[data-ifilter]').forEach(p => p.setAttribute('aria-pressed','false'));
+  pill.setAttribute('aria-pressed','true');
+  S.inboxFilter = f;
+  loadInbox();
+}
+
+// Wire up search with debounce
+document.getElementById('inbox-search')?.addEventListener('input', e => {
+  clearTimeout(_searchDebounce);
+  _searchDebounce = setTimeout(() => {
+    S.inboxSearch = e.target.value.trim();
+    loadInbox();
+  }, 400);
+});
+
+/* ══════════════════════════════════════
+   MESSAGE DETAIL MODAL
+══════════════════════════════════════ */
+async function openDetail(id) {
+  // Fetch fresh from server to get latest status
+  let msg = S.inboxMessages.find(m => m.id === id);
+  if (S.backendOnline) {
+    try {
+      const res  = await fetch(`${API_BASE}/messages/${id}`);
+      const data = await res.json();
+      if (data.success) msg = data.message;
+    } catch(_) {}
+  }
+  if (!msg) return;
+
+  const appUrl  = window.location.origin;
+  const viewUrl = msg.view_token ? `${appUrl}/view/${msg.view_token}` : null;
+
+  const schedRow = msg.scheduled_at
+    ? `<div><p class="font-label text-[9px] uppercase tracking-widest text-c-sec mb-1">Scheduled For</p><p class="font-body text-c-on">${new Date(msg.scheduled_at).toLocaleString()}</p></div>` : '';
+  const retryRow = msg.retry_count > 0
+    ? `<div><p class="font-label text-[9px] uppercase tracking-widest text-c-sec mb-1">Retry Count</p><p class="font-body text-c-on">${msg.retry_count}/5</p></div>` : '';
+
+  document.getElementById('detail-content').innerHTML = `
+    <div class="grid grid-cols-2 gap-4 text-sm">
+      <div><p class="font-label text-[9px] uppercase tracking-widest text-c-sec mb-1">To</p>
+        <p class="font-body font-semibold text-c-on">${esc(msg.to_name)}</p>
+        <p class="font-body text-xs text-c-sec break-all">${esc(msg.to_contact)}</p></div>
+      <div><p class="font-label text-[9px] uppercase tracking-widest text-c-sec mb-1">From</p>
+        <p class="font-body font-semibold text-c-on">${esc(msg.from_name)}</p></div>
+      <div><p class="font-label text-[9px] uppercase tracking-widest text-c-sec mb-1">Channel</p>
+        <p class="font-body text-c-on capitalize">${esc(msg.channel)}</p></div>
+      <div><p class="font-label text-[9px] uppercase tracking-widest text-c-sec mb-1">Status</p>
+        <p class="font-body text-c-on capitalize font-semibold">${esc(msg.status)}</p></div>
+      <div><p class="font-label text-[9px] uppercase tracking-widest text-c-sec mb-1">Sent</p>
+        <p class="font-body text-c-on">${msg.sent_at ? new Date(msg.sent_at).toLocaleString() : '—'}</p></div>
+      <div><p class="font-label text-[9px] uppercase tracking-widest text-c-sec mb-1">First Opened</p>
+        <p class="font-body text-c-on">${msg.viewed_at ? new Date(msg.viewed_at).toLocaleString() : 'Not yet'}</p></div>
+      ${msg.view_count > 0 ? `<div><p class="font-label text-[9px] uppercase tracking-widest text-c-sec mb-1">Total Views</p><p class="font-body text-c-on">${msg.view_count}</p></div>` : ''}
+      ${schedRow}${retryRow}
+    </div>
+    <div class="bg-c-surf-low rounded-xl p-5 mt-1">
+      <p class="font-label text-[9px] uppercase tracking-widest text-c-sec mb-2">Message</p>
+      <p class="font-body text-sm text-c-on-v leading-relaxed whitespace-pre-wrap">${esc(msg.body)}</p>
+    </div>
+    ${msg.song ? `<div class="flex items-center gap-2 text-c-sec text-xs"><span class="material-symbols-outlined text-sm">music_note</span>${esc(msg.song)}</div>` : ''}
+    ${msg.error_msg ? `<div class="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-xs leading-relaxed"><strong>Error:</strong> ${esc(msg.error_msg)}</div>` : ''}
+  `;
+
+  const linkEl = document.getElementById('detail-view-link');
+  if (viewUrl) { linkEl.href=viewUrl; linkEl.classList.remove('hidden'); }
+  else linkEl.classList.add('hidden');
+
+  // Show/hide resend button
+  const resendBtn = document.getElementById('detail-resend-btn');
+  if (resendBtn) {
+    const canResend = msg.status === 'failed' && msg.retry_count < 5;
+    resendBtn.classList.toggle('hidden', !canResend);
+    resendBtn.onclick = async () => { await resendMessage(id); closeModal('detail'); };
+  }
+
+  document.getElementById('detail-delete-btn').onclick = async () => {
+    if (!confirm(`Delete this message to "${msg.to_name}"? This cannot be undone.`)) return;
+    await deleteMessage(id);
+    closeModal('detail');
+  };
+
+  openModal('detail');
+}
+
+async function resendMessage(id) {
+  if (!S.backendOnline) { toast('Backend not connected.'); return; }
+  try {
+    toast('Resending… ⏳');
+    const res  = await fetch(`${API_BASE}/messages/${id}/resend`, { method:'POST' });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+    toast('✓ Resent successfully!');
+    loadInbox();
+  } catch(e) {
+    toast('❌ Resend failed: ' + e.message);
+  }
+}
+
+async function deleteMessage(id) {
+  if (!S.backendOnline) { toast('Backend not connected.'); return; }
+  try {
+    await fetch(`${API_BASE}/messages/${id}`, { method:'DELETE' });
+    S.inboxMessages = S.inboxMessages.filter(m => m.id !== id);
+    loadInbox();
+    toast('Message deleted.');
+  } catch(e) {
+    toast('Delete failed: ' + e.message);
+  }
+}
+
+/* ══════════════════════════════════════
+   STATS
+══════════════════════════════════════ */
+async function loadStats(){
+  if(!S.backendOnline) return;
+  try {
+    const res  = await fetch(API_BASE+'/stats');
+    const data = await res.json();
+    const st   = data.stats || {};
+    const set  = (id,v) => { const el=document.getElementById(id); if(el) el.textContent = v ?? '0'; };
+    set('stat-total', st.total);
+    set('stat-sent',  (st.sent||0) + (st.read||0)); // sent includes read
+    set('stat-read',  st.read);
+    set('stat-wa',    st.via_whatsapp);
+  } catch(_) {}
+}
+
+/* ══════════════════════════════════════
+   SETTINGS
+══════════════════════════════════════ */
+async function loadSettings() {
+  if (!S.backendOnline) return;
+  try {
+    const res  = await fetch(API_BASE+'/settings');
+    const data = await res.json();
+    const s    = data.settings || {};
+    const set  = (id, val) => { const el=document.getElementById(id); if(el && val) el.value=val; };
+    set('cfg-email-user',   s.EMAIL_USER);
+    set('cfg-email-host',   s.EMAIL_HOST   || 'smtp.gmail.com');
+    set('cfg-email-port',   s.EMAIL_PORT   || '587');
+    set('cfg-email-from',   s.EMAIL_FROM);
+    set('cfg-twilio-sid',   s.TWILIO_ACCOUNT_SID);
+    set('cfg-twilio-from',  s.TWILIO_WHATSAPP_FROM);
+    set('cfg-app-url',      s.APP_URL);
+    // Password fields show placeholder if set
+    if (s.EMAIL_PASS)        document.getElementById('cfg-email-pass').placeholder   = '(saved — leave blank to keep)';
+    if (s.TWILIO_AUTH_TOKEN) document.getElementById('cfg-twilio-token').placeholder = '(saved — leave blank to keep)';
+  } catch(_) {}
+}
+
+async function saveSettings() {
+  if (!S.backendOnline) { showSettingsStatus('Backend not connected. Start the server first.', 'error'); return; }
+  const btn = document.getElementById('settings-save-btn');
+  const txt = document.getElementById('settings-save-txt');
+  btn.disabled = true; txt.textContent = 'Saving…';
+
+  const payload = {
+    EMAIL_HOST:             document.getElementById('cfg-email-host').value.trim(),
+    EMAIL_PORT:             document.getElementById('cfg-email-port').value.trim(),
+    EMAIL_USER:             document.getElementById('cfg-email-user').value.trim(),
+    EMAIL_FROM:             document.getElementById('cfg-email-from').value.trim(),
+    APP_URL:                document.getElementById('cfg-app-url').value.trim(),
+    TWILIO_ACCOUNT_SID:     document.getElementById('cfg-twilio-sid').value.trim(),
+    TWILIO_WHATSAPP_FROM:   document.getElementById('cfg-twilio-from').value.trim(),
+  };
+  // Only include passwords if user typed something new
+  const emailPass  = document.getElementById('cfg-email-pass').value;
+  const twilioTok  = document.getElementById('cfg-twilio-token').value;
+  if (emailPass && emailPass !== '••••••••') payload.EMAIL_PASS = emailPass;
+  if (twilioTok && twilioTok !== '••••••••') payload.TWILIO_AUTH_TOKEN = twilioTok;
+
+  try {
+    const res  = await fetch(API_BASE+'/settings', {
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+    showSettingsStatus(`✓ Saved ${data.saved.length} setting(s) successfully. Changes take effect immediately.`, 'success');
+    // Clear password fields
+    document.getElementById('cfg-email-pass').value  = '';
+    document.getElementById('cfg-twilio-token').value = '';
+  } catch(e) {
+    showSettingsStatus('❌ Save failed: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false; txt.textContent = 'Save Settings';
+  }
+}
+
+async function testEmail() {
+  if (!S.backendOnline) { showSettingsStatus('Backend not connected.', 'error'); return; }
+  const to = document.getElementById('test-email-to').value.trim();
+  if (!to) { toast('Enter a test email address first.'); return; }
+  toast('Sending test email… ⏳');
+  try {
+    const res  = await fetch(API_BASE+'/settings/test-email', {
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ to }),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+    showSettingsStatus('✓ ' + data.message, 'success');
+  } catch(e) {
+    showSettingsStatus('❌ ' + e.message, 'error');
+  }
+}
+
+async function testWhatsApp() {
+  if (!S.backendOnline) { showSettingsStatus('Backend not connected.', 'error'); return; }
+  const to = document.getElementById('test-wa-to').value.trim();
+  if (!to) { toast('Enter a phone number first (e.g. +2348012345678).'); return; }
+  toast('Sending test WhatsApp… ⏳');
+  try {
+    const res  = await fetch(API_BASE+'/settings/test-whatsapp', {
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ to }),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+    showSettingsStatus('✓ ' + data.message, 'success');
+  } catch(e) {
+    showSettingsStatus('❌ ' + e.message, 'error');
+  }
+}
+
+function showSettingsStatus(msg, type) {
+  const el = document.getElementById('settings-status');
+  el.textContent = msg;
+  el.className = type === 'success'
+    ? 'mb-8 rounded-xl px-5 py-4 font-body text-sm font-medium bg-green-50 border border-green-200 text-green-800'
+    : 'mb-8 rounded-xl px-5 py-4 font-body text-sm font-medium bg-red-50 border border-red-200 text-red-800';
+  el.classList.remove('hidden');
+  setTimeout(() => el.classList.add('hidden'), 6000);
+}
+
+/* ══════════════════════════════════════
+   TEMPLATES
+══════════════════════════════════════ */
+const TEMPLATES = {
+  vintage:  {
+    body: 'Every second away from you feels like a season lost.\n\nI find your ghost in the smell of old books and autumn rain. In the golden hour that falls exactly the way it did the evening we first met.\n\nThinking of you, always.',
+    accent: '#ae1417',
+  },
+  modern:   {
+    body: 'You are the only detail that matters.\n\nIn a world that moves too fast, you are the thing I want to slow down for. The constant I return to. The home I carry everywhere.\n\nAlways yours.',
+    accent: '#805062',
+  },
+  midnight: {
+    body: "These are the words I could only write at midnight.\n\nWhen the world is finally quiet enough to hear my heart — and it's saying your name.\n\nUntil morning,",
+    accent: '#31312b',
+  },
+};
+
+function applyTemplate(key) {
+  const t = TEMPLATES[key]; if (!t) return;
+  document.getElementById('f-body').value = t.body;
+  const sw = document.querySelector(`.swatch[data-swatch="${t.accent}"]`) || document.querySelector('.swatch');
+  selectSwatch(sw);
+  showPage('create');
+  toast('Template applied ✓');
+}
+
+/* ══════════════════════════════════════
+   LIKES
+══════════════════════════════════════ */
+function toggleLike(btn) {
+  const on = btn.getAttribute('aria-pressed') === 'true';
+  btn.setAttribute('aria-pressed', on ? 'false' : 'true');
+  btn.querySelector('.hi').style.fontVariationSettings = on
+    ? "'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24"
+    : "'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24";
+  if (!on) toast('Added to favourites ♥');
+}
+
+/* ══════════════════════════════════════
+   DOWNLOAD
+══════════════════════════════════════ */
+function getLetter() {
+  return {
+    to:     document.getElementById('f-to').value.trim()   || 'My Dearest',
+    body:   document.getElementById('f-body').value.trim() || '',
+    from:   document.getElementById('f-from').value.trim() || 'With Love',
+    song:   S.song !== null ? SONGS[S.song].name : 'No song',
+    accent: S.accent,
+  };
+}
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function triggerDL(name, mime, content) {
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(new Blob([content], { type: mime })),
+    download: name,
+  });
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+
+function downloadLetter(fmt) {
+  const d = getLetter();
+  if (!d.body) { toast('Write your letter first.'); return; }
+
+  if (fmt === 'txt') {
+    triggerDL('my-letter.txt','text/plain;charset=utf-8',
+      ['THE EDITORIAL MUSE','─'.repeat(36),'',d.to,'',d.body,'','With all my love,',d.from,'','─'.repeat(36),'♪ '+d.song].join('\n'));
+    toast('Downloaded .txt ✓');
+  }
+
+  else if (fmt === 'html') {
+    const html = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>A Letter</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;1,400&family=Manrope:wght@400;600&display=swap" rel="stylesheet"/>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{background:#fdf9f0;display:flex;justify-content:center;padding:48px 16px;font-family:'Manrope',sans-serif}.card{background:#fff;max-width:620px;width:100%;border-radius:16px;padding:52px 60px;border-top:3px solid ${esc(d.accent)};box-shadow:0 40px 60px -20px rgba(28,28,23,.1)}.to{font-family:'Noto Serif',serif;font-style:italic;font-size:1.4rem;color:#1c1c17;margin-bottom:28px}.rule{width:28px;height:1px;background:${esc(d.accent)};opacity:.4;margin-bottom:22px}.body{font-size:1rem;line-height:1.9;color:#5b403d;white-space:pre-wrap;margin-bottom:36px}.sig-lbl{font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:${esc(d.accent)};margin-bottom:6px}.from{font-family:'Noto Serif',serif;font-style:italic;font-size:1.25rem;color:#1c1c17;text-align:right}.foot{margin-top:28px;padding-top:16px;border-top:1px solid #e4beba;font-size:.72rem;color:#805062}@media(max-width:520px){.card{padding:36px 24px}}</style>
+</head><body><div class="card">
+<p class="to">${esc(d.to)}</p><div class="rule"></div>
+<p class="body">${esc(d.body)}</p>
+<div style="text-align:right"><p class="sig-lbl">With all my love,</p><p class="from">${esc(d.from)}</p></div>
+<div class="foot">♪ ${esc(d.song)}</div>
+</div></body></html>`;
+    triggerDL('my-letter.html','text/html;charset=utf-8', html);
+    toast('Downloaded HTML ✓');
+  }
+
+  else if (fmt === 'pdf') {
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>My Letter</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;1,400&family=Manrope:wght@400;600&display=swap" rel="stylesheet"/>
+<style>@page{size:A4;margin:2.5cm}body{font-family:'Manrope',sans-serif;color:#1c1c17}.letter{max-width:480px;margin:0 auto;border-top:3px solid ${esc(d.accent)};padding-top:32px}.to{font-family:'Noto Serif',serif;font-style:italic;font-size:1.4rem;margin-bottom:24px}.rule{width:24px;height:1px;background:${esc(d.accent)};opacity:.5;margin-bottom:20px}.body{font-size:1rem;line-height:1.85;color:#5b403d;white-space:pre-wrap;margin-bottom:32px}.sig-lbl{font-size:.62rem;letter-spacing:.25em;text-transform:uppercase;color:${esc(d.accent)};margin-bottom:5px}.from{font-family:'Noto Serif',serif;font-style:italic;font-size:1.2rem;text-align:right}.foot{margin-top:28px;font-size:.7rem;color:#805062;border-top:1px solid #e4beba;padding-top:14px}.brand{margin-top:28px;text-align:center;font-family:'Noto Serif',serif;font-style:italic;color:#805062;font-size:.8rem}</style>
+</head><body>
+<div class="letter"><p class="to">${esc(d.to)}</p><div class="rule"></div><p class="body">${esc(d.body)}</p>
+<div style="text-align:right"><p class="sig-lbl">With all my love,</p><p class="from">${esc(d.from)}</p></div>
+<div class="foot">♪ ${esc(d.song)}</div></div>
+<p class="brand">Created with The Editorial Muse</p>
+<script>document.fonts.ready.then(()=>window.print());<\/script>
+</body></html>`;
+    const url = URL.createObjectURL(new Blob([html], { type:'text/html;charset=utf-8' }));
+    const w = window.open(url, '_blank');
+    if (!w) triggerDL('my-letter-print.html','text/html;charset=utf-8', html);
+    setTimeout(() => URL.revokeObjectURL(url), 12000);
+    toast('Opening PDF print dialog… ✓');
+  }
+}
+
+/* ══════════════════════════════════════
+   INIT
+══════════════════════════════════════ */
+(async function init() {
+  // Show home page immediately
+  const home = document.getElementById('page-home');
+  home.classList.add('show');
+  requestAnimationFrame(() => requestAnimationFrame(() => home.classList.add('visible')));
+  S.page = 'home';
+
+  // Init aria-current on nav buttons
+  PAGES.forEach(p => {
+    const b = document.getElementById('nav-' + p);
+    if (b) b.setAttribute('aria-current', 'false');
+  });
+
+  // Set min datetime for schedule input to now
+  const schedInput = document.getElementById('f-schedule');
+  if (schedInput) {
+    const pad = n => String(n).padStart(2,'0');
+    const now = new Date(Date.now() + 5*60*1000); // 5 min in future
+    schedInput.min = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  }
+
+  // Check backend connectivity
+  await checkBackend();
+  loadStats();
+})();
+</script>
+</body>
+</html>

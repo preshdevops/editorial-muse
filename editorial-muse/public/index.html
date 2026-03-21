@@ -142,25 +142,99 @@ textarea:focus,input:focus{outline:none;box-shadow:none!important}
 /* Stats cards */
 .stat-card{background:var(--c-white);border-radius:16px;padding:24px 28px;border:1px solid var(--c-out-v)/30}
 
-/* API alert */
-.api-alert{background:#fef3c7;border:1px solid #fcd34d;color:#92400e;border-radius:12px;padding:14px 18px;font-size:.8rem;line-height:1.5}
+/* Mobile nav */
+.mobile-nav-item[aria-current="page"] { background:var(--c-pri-lt); color:var(--c-pri); }
+.mobile-nav-item[aria-current="page"] .material-symbols-outlined { color:var(--c-pri); }
+
+/* Bottom nav bar */
+.bottom-nav-btn { color:var(--c-sec); transition:color .2s,background .2s; }
+.bottom-nav-btn .bnav-icon { color:var(--c-sec); transition:color .2s; }
+.bottom-nav-btn .bnav-label { color:var(--c-sec); transition:color .2s; }
+.bottom-nav-btn[aria-current="page"] { background:var(--c-pri-lt); border-radius:12px; }
+.bottom-nav-btn[aria-current="page"] .bnav-icon { color:var(--c-pri); font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24; }
+.bottom-nav-btn[aria-current="page"] .bnav-label { color:var(--c-pri); font-weight:700; }
+
+/* Extra bottom padding on mobile so content clears the bottom nav */
+@media(max-width:768px){
+  .page { padding-bottom: 80px; }
+}
 </style>
 </head>
 <body class="bg-c-bg text-c-on font-body antialiased">
 
 <!-- ═══════ TOP NAV ═══════ -->
 <header class="sticky top-0 bg-c-bg sh-nav z-50" role="banner">
-  <div class="max-w-7xl mx-auto px-6 md:px-12 py-5 flex justify-between items-center">
-    <button data-nav="home" class="nav-btn text-2xl font-headline italic text-c-on" aria-label="Go to homepage">The Editorial Muse</button>
+  <div class="max-w-7xl mx-auto px-4 md:px-12 py-4 flex justify-between items-center">
+    <button data-nav="home" class="nav-btn text-xl md:text-2xl font-headline italic text-c-on" aria-label="Go to homepage">The Editorial Muse</button>
+    <!-- Desktop nav -->
     <nav class="hidden md:flex items-center gap-10" aria-label="Main">
       <button data-nav="create"    id="nav-create"    class="nav-btn" aria-current="false">Compose</button>
       <button data-nav="inbox"     id="nav-inbox"     class="nav-btn" aria-current="false">Inbox</button>
       <button data-nav="templates" id="nav-templates" class="nav-btn" aria-current="false">Templates</button>
       <button data-nav="settings"  id="nav-settings"  class="nav-btn" aria-current="false">Settings</button>
     </nav>
-    <button data-nav="create" class="bg-gradient-to-r from-c-pri to-c-pri-dk text-white rounded-full px-7 py-2.5 font-label font-semibold text-xs tracking-widest uppercase sh-float active:scale-95 transition-transform border-0 cursor-pointer">Send Love</button>
+    <div class="flex items-center gap-3">
+      <button data-nav="create" class="hidden md:block bg-gradient-to-r from-c-pri to-c-pri-dk text-white rounded-full px-7 py-2.5 font-label font-semibold text-xs tracking-widest uppercase sh-float active:scale-95 transition-transform border-0 cursor-pointer">Send Love</button>
+      <!-- Hamburger (mobile only) -->
+      <button id="mobile-menu-btn" class="md:hidden p-2 rounded-xl bg-c-surf-low border-0 cursor-pointer" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+        <span class="material-symbols-outlined text-c-on">menu</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile dropdown menu -->
+  <div id="mobile-menu" class="md:hidden hidden bg-c-bg border-t border-c-out-v/20" role="dialog" aria-label="Mobile navigation">
+    <nav class="flex flex-col p-4 gap-1" aria-label="Mobile main navigation">
+      <button data-nav="home"      id="mnav-home"      class="mobile-nav-item text-left px-4 py-3.5 rounded-xl font-headline text-base text-c-on border-0 bg-transparent cursor-pointer flex items-center gap-3 hover:bg-c-surf-low transition-colors">
+        <span class="material-symbols-outlined text-c-sec text-lg">home</span> Home
+      </button>
+      <button data-nav="create"    id="mnav-create"    class="mobile-nav-item text-left px-4 py-3.5 rounded-xl font-headline text-base text-c-on border-0 bg-transparent cursor-pointer flex items-center gap-3 hover:bg-c-surf-low transition-colors">
+        <span class="material-symbols-outlined text-c-sec text-lg">edit</span> Compose
+      </button>
+      <button data-nav="inbox"     id="mnav-inbox"     class="mobile-nav-item text-left px-4 py-3.5 rounded-xl font-headline text-base text-c-on border-0 bg-transparent cursor-pointer flex items-center gap-3 hover:bg-c-surf-low transition-colors">
+        <span class="material-symbols-outlined text-c-sec text-lg">mail</span> Inbox
+      </button>
+      <button data-nav="templates" id="mnav-templates" class="mobile-nav-item text-left px-4 py-3.5 rounded-xl font-headline text-base text-c-on border-0 bg-transparent cursor-pointer flex items-center gap-3 hover:bg-c-surf-low transition-colors">
+        <span class="material-symbols-outlined text-c-sec text-lg">auto_awesome</span> Templates
+      </button>
+      <button data-nav="settings"  id="mnav-settings"  class="mobile-nav-item text-left px-4 py-3.5 rounded-xl font-headline text-base text-c-on border-0 bg-transparent cursor-pointer flex items-center gap-3 hover:bg-c-surf-low transition-colors">
+        <span class="material-symbols-outlined text-c-sec text-lg">settings</span> Settings
+      </button>
+      <div class="pt-2 border-t border-c-out-v/20 mt-2">
+        <button data-nav="create" class="w-full bg-gradient-to-r from-c-pri to-c-pri-dk text-white rounded-full px-7 py-3.5 font-label font-semibold text-sm tracking-widest uppercase sh-float active:scale-95 transition-transform border-0 cursor-pointer">
+          ✉ Send Love
+        </button>
+      </div>
+    </nav>
   </div>
 </header>
+
+<!-- Mobile bottom nav bar -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-c-bg border-t border-c-out-v/20 flex items-center justify-around px-2 py-2" aria-label="Bottom navigation" style="padding-bottom: env(safe-area-inset-bottom, 8px);">
+  <button data-nav="home" class="bottom-nav-btn flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl border-0 bg-transparent cursor-pointer" aria-label="Home">
+    <span class="material-symbols-outlined bnav-icon" style="font-size:1.4rem">home</span>
+    <span class="font-label text-[9px] uppercase tracking-wider bnav-label">Home</span>
+  </button>
+  <button data-nav="create" class="bottom-nav-btn flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl border-0 bg-transparent cursor-pointer" aria-label="Compose">
+    <span class="material-symbols-outlined bnav-icon" style="font-size:1.4rem">edit</span>
+    <span class="font-label text-[9px] uppercase tracking-wider bnav-label">Compose</span>
+  </button>
+  <button data-nav="inbox" class="bottom-nav-btn flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl border-0 bg-transparent cursor-pointer" aria-label="Inbox">
+    <span class="material-symbols-outlined bnav-icon" style="font-size:1.4rem">mail</span>
+    <span class="font-label text-[9px] uppercase tracking-wider bnav-label">Inbox</span>
+  </button>
+  <button data-nav="templates" class="bottom-nav-btn flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl border-0 bg-transparent cursor-pointer" aria-label="Templates">
+    <span class="material-symbols-outlined bnav-icon" style="font-size:1.4rem">auto_awesome</span>
+    <span class="font-label text-[9px] uppercase tracking-wider bnav-label">Templates</span>
+  </button>
+  <button data-nav="settings" class="bottom-nav-btn flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl border-0 bg-transparent cursor-pointer" aria-label="Settings">
+    <span class="material-symbols-outlined bnav-icon" style="font-size:1.4rem">settings</span>
+    <span class="font-label text-[9px] uppercase tracking-wider bnav-label">Settings</span>
+  </button>
+</nav>
+
+<!-- Spacer so content isn't hidden behind bottom nav on mobile -->
+<div class="md:hidden h-16"></div>
 
 <!-- ═══════ PAGE: HOME ═══════ -->
 <div id="page-home" class="page" role="main">
@@ -658,27 +732,98 @@ const S = {
 };
 
 /* ══════════════════════════════════════
-   NAVIGATION
+   NAVIGATION — history API + mobile nav
 ══════════════════════════════════════ */
 const PAGES = ['home','create','inbox','templates','settings'];
 
-function showPage(id) {
+function showPage(id, pushState=true) {
   if (!PAGES.includes(id) || S.page === id) return;
+
+  // Hide current
   if (S.page) {
     const prev = document.getElementById('page-' + S.page);
     prev.classList.remove('visible');
-    prev.addEventListener('transitionend', function h(){ prev.removeEventListener('transitionend',h); prev.classList.remove('show'); }, {once:true});
+    prev.addEventListener('transitionend', function h(){
+      prev.removeEventListener('transitionend', h);
+      prev.classList.remove('show');
+    }, { once:true });
   }
+
   S.page = id;
+
+  // Show new page
   const next = document.getElementById('page-' + id);
   next.classList.add('show');
-  requestAnimationFrame(()=>requestAnimationFrame(()=>next.classList.add('visible')));
-  PAGES.forEach(p=>{ const b=document.getElementById('nav-'+p); if(b) b.setAttribute('aria-current', p===id?'page':'false'); });
-  window.scrollTo({top:0,behavior:'smooth'});
+  requestAnimationFrame(() => requestAnimationFrame(() => next.classList.add('visible')));
+
+  // Push browser history so back button works
+  if (pushState) history.pushState({ page: id }, '', '#' + id);
+
+  // Update all nav indicators
+  updateNavState(id);
+
+  // Close mobile menu
+  closeMobileMenu();
+
+  window.scrollTo({ top:0, behavior:'smooth' });
   if (id === 'inbox')    { S.inboxPage=1; loadInbox(); }
   if (id === 'home')     loadStats();
   if (id === 'settings') loadSettings();
 }
+
+function updateNavState(id) {
+  // Desktop nav
+  PAGES.forEach(p => {
+    const b = document.getElementById('nav-' + p);
+    if (b) b.setAttribute('aria-current', p === id ? 'page' : 'false');
+  });
+  // Mobile dropdown nav
+  PAGES.forEach(p => {
+    const b = document.getElementById('mnav-' + p);
+    if (b) b.setAttribute('aria-current', p === id ? 'page' : 'false');
+  });
+  // Bottom nav bar
+  document.querySelectorAll('.bottom-nav-btn').forEach(btn => {
+    btn.setAttribute('aria-current', btn.dataset.nav === id ? 'page' : 'false');
+  });
+}
+
+// Browser back/forward button support
+window.addEventListener('popstate', e => {
+  const page = e.state?.page || 'home';
+  showPage(page, false);
+});
+
+// Mobile hamburger
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobile-menu');
+  const btn  = document.getElementById('mobile-menu-btn');
+  const isOpen = !menu.classList.contains('hidden');
+  if (isOpen) { closeMobileMenu(); }
+  else {
+    menu.classList.remove('hidden');
+    btn.setAttribute('aria-expanded', 'true');
+    btn.querySelector('.material-symbols-outlined').textContent = 'close';
+  }
+}
+function closeMobileMenu() {
+  const menu = document.getElementById('mobile-menu');
+  const btn  = document.getElementById('mobile-menu-btn');
+  if (!menu) return;
+  menu.classList.add('hidden');
+  btn.setAttribute('aria-expanded', 'false');
+  btn.querySelector('.material-symbols-outlined').textContent = 'menu';
+}
+document.getElementById('mobile-menu-btn').addEventListener('click', toggleMobileMenu);
+
+// Close mobile menu when tapping outside
+document.addEventListener('click', e => {
+  const menu = document.getElementById('mobile-menu');
+  const btn  = document.getElementById('mobile-menu-btn');
+  if (!menu.classList.contains('hidden') && !menu.contains(e.target) && !btn.contains(e.target)) {
+    closeMobileMenu();
+  }
+});
 
 /* ══════════════════════════════════════
    GLOBAL DELEGATION
@@ -1390,29 +1535,35 @@ function downloadLetter(fmt) {
    INIT
 ══════════════════════════════════════ */
 (async function init() {
-  // Show home page immediately
-  const home = document.getElementById('page-home');
-  home.classList.add('show');
-  requestAnimationFrame(() => requestAnimationFrame(() => home.classList.add('visible')));
-  S.page = 'home';
+  // Read page from URL hash on load (supports bookmarking + refresh)
+  const hashPage = window.location.hash.replace('#','');
+  const startPage = PAGES.includes(hashPage) ? hashPage : 'home';
 
-  // Init aria-current on nav buttons
-  PAGES.forEach(p => {
-    const b = document.getElementById('nav-' + p);
-    if (b) b.setAttribute('aria-current', 'false');
-  });
+  // Show initial page
+  const startEl = document.getElementById('page-' + startPage);
+  startEl.classList.add('show');
+  requestAnimationFrame(() => requestAnimationFrame(() => startEl.classList.add('visible')));
+  S.page = startPage;
 
-  // Set min datetime for schedule input to now
+  // Push initial history state so back button works from first page
+  history.replaceState({ page: startPage }, '', '#' + startPage);
+
+  // Init all nav states
+  updateNavState(startPage);
+
+  // Set min datetime for schedule input
   const schedInput = document.getElementById('f-schedule');
   if (schedInput) {
     const pad = n => String(n).padStart(2,'0');
-    const now = new Date(Date.now() + 5*60*1000); // 5 min in future
+    const now = new Date(Date.now() + 5*60*1000);
     schedInput.min = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
   }
 
-  // Check backend connectivity
+  // Check backend + load data for start page
   await checkBackend();
-  loadStats();
+  if (startPage === 'home')     loadStats();
+  if (startPage === 'inbox')    loadInbox();
+  if (startPage === 'settings') loadSettings();
 })();
 </script>
 </body>

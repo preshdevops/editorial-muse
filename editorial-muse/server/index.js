@@ -1,5 +1,5 @@
 // server/index.js
-try { require('dotenv').config(); } catch(_) {}
+require('dotenv').config();
 
 const express = require('express');
 const cors    = require('cors');
@@ -7,10 +7,9 @@ const path    = require('path');
 const db      = require('./db');
 const routes  = require('./routes');
 const { sendEmail }    = require('./emailService');
-const { sendWhatsApp } = require('./whatsappService');
 
 const app  = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 // ── Load any settings saved in the DB into process.env ────────────────────────
 // (DB settings override .env so users can reconfigure without editing files)
@@ -67,9 +66,7 @@ function runScheduledWorker() {
   for (const msg of due) {
     const viewUrl = `${process.env.APP_URL || 'http://localhost:' + PORT}/view/${msg.view_token}`;
 
-    const deliverFn = msg.channel === 'email'
-      ? sendEmail({ ...msg, viewUrl })
-      : sendWhatsApp({ ...msg, viewUrl });
+    const deliverFn = sendEmail({ ...msg, viewUrl });
 
     deliverFn
       .then(() => {
@@ -84,7 +81,7 @@ function runScheduledWorker() {
 }
 
 // ── Start ─────────────────────────────────────────────────────────────────────
-app.listen(3000, '127.0.0.1', () => {
+app.listen(PORT, () => {
   console.log(`
   ┌─────────────────────────────────────────────────┐
   │          The Editorial Muse — Server            │

@@ -19,7 +19,7 @@
         "c-sec":"#805062","c-sec-ct":"#fec1d6","c-tert":"#9f2561",
         "c-inv":"#31312b","c-inv-on":"#f4f0e8",
         "c-out":"#8f6f6c","c-out-v":"#e4beba",
-        "c-wa":"#25d366","c-wa-lt":"#dcf8c6",
+        
       },
       fontFamily:{headline:["Noto Serif","serif"],body:["Manrope","sans-serif"],label:["Manrope","sans-serif"]},
     }},
@@ -32,7 +32,7 @@
   --c-pri:#ae1417;--c-pri-dk:#d2312c;--c-pri-lt:#ffdad6;--c-pri-dim:#ffb4ab;
   --c-sec:#805062;--c-sec-ct:#fec1d6;--c-tert:#9f2561;
   --c-inv:#31312b;--c-inv-on:#f4f0e8;--c-out:#8f6f6c;--c-out-v:#e4beba;
-  --c-wa:#25d366;--c-wa-lt:#dcf8c6;
+  
   --accent:#ae1417;
 }
 *,*::before,*::after{box-sizing:border-box}
@@ -93,11 +93,9 @@ body{background:var(--c-bg);color:var(--c-on);font-family:'Manrope',sans-serif}
 .song:hover{background:var(--c-surf-high)}
 .song[aria-selected="true"]{border-left-color:var(--c-pri);background:var(--c-surf-low)}
 
-/* Channel selector */
-.channel-card{border:2px solid var(--c-out-v);border-radius:16px;padding:20px;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;background:var(--c-white)}
-.channel-card:hover{border-color:var(--c-pri);transform:translateY(-2px)}
-.channel-card.selected-email{border-color:var(--c-pri);background:var(--c-pri-lt)}
-.channel-card.selected-wa{border-color:var(--c-wa);background:var(--c-wa-lt)}
+/* Email contact field */
+.contact-field{border:1px solid var(--c-out-v);border-radius:12px;padding:10px 16px;font-family:'Manrope',sans-serif;font-size:.875rem;color:var(--c-on);background:var(--c-surf-low);width:100%;transition:border-color .2s}
+.contact-field:focus{border-color:var(--c-pri);outline:none}
 
 /* Inbox */
 .msg-row{transition:background .15s,box-shadow .15s;cursor:pointer}
@@ -171,7 +169,6 @@ textarea:focus,input:focus{outline:none;box-shadow:none!important}
       <button data-nav="create"    id="nav-create"    class="nav-btn" aria-current="false">Compose</button>
       <button data-nav="inbox"     id="nav-inbox"     class="nav-btn" aria-current="false">Inbox</button>
       <button data-nav="templates" id="nav-templates" class="nav-btn" aria-current="false">Templates</button>
-      <button data-nav="settings"  id="nav-settings"  class="nav-btn" aria-current="false">Settings</button>
     </nav>
     <div class="flex items-center gap-3">
       <button data-nav="create" class="hidden md:block bg-gradient-to-r from-c-pri to-c-pri-dk text-white rounded-full px-7 py-2.5 font-label font-semibold text-xs tracking-widest uppercase sh-float active:scale-95 transition-transform border-0 cursor-pointer">Send Love</button>
@@ -196,9 +193,6 @@ textarea:focus,input:focus{outline:none;box-shadow:none!important}
       </button>
       <button data-nav="templates" id="mnav-templates" class="mobile-nav-item text-left px-4 py-3.5 rounded-xl font-headline text-base text-c-on border-0 bg-transparent cursor-pointer flex items-center gap-3 hover:bg-c-surf-low transition-colors">
         <span class="material-symbols-outlined text-c-sec text-lg">auto_awesome</span> Templates
-      </button>
-      <button data-nav="settings"  id="mnav-settings"  class="mobile-nav-item text-left px-4 py-3.5 rounded-xl font-headline text-base text-c-on border-0 bg-transparent cursor-pointer flex items-center gap-3 hover:bg-c-surf-low transition-colors">
-        <span class="material-symbols-outlined text-c-sec text-lg">settings</span> Settings
       </button>
       <div class="pt-2 border-t border-c-out-v/20 mt-2">
         <button data-nav="create" class="w-full bg-gradient-to-r from-c-pri to-c-pri-dk text-white rounded-full px-7 py-3.5 font-label font-semibold text-sm tracking-widest uppercase sh-float active:scale-95 transition-transform border-0 cursor-pointer">
@@ -227,9 +221,9 @@ textarea:focus,input:focus{outline:none;box-shadow:none!important}
     <span class="material-symbols-outlined bnav-icon" style="font-size:1.4rem">auto_awesome</span>
     <span class="font-label text-[9px] uppercase tracking-wider bnav-label">Templates</span>
   </button>
-  <button data-nav="settings" class="bottom-nav-btn flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl border-0 bg-transparent cursor-pointer" aria-label="Settings">
-    <span class="material-symbols-outlined bnav-icon" style="font-size:1.4rem">settings</span>
-    <span class="font-label text-[9px] uppercase tracking-wider bnav-label">Settings</span>
+  <button data-nav="inbox" class="bottom-nav-btn flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl border-0 bg-transparent cursor-pointer" aria-label="Inbox">
+    <span class="material-symbols-outlined bnav-icon" style="font-size:1.4rem">favorite</span>
+    <span class="font-label text-[9px] uppercase tracking-wider bnav-label">Sent</span>
   </button>
 </nav>
 
@@ -247,7 +241,7 @@ textarea:focus,input:focus{outline:none;box-shadow:none!important}
       <div class="py-20">
         <span class="au au1 font-label uppercase tracking-[.22em] text-c-sec text-xs mb-6 block">Digital Stationery Reimagined</span>
         <h1 class="au au2 font-headline text-6xl md:text-8xl text-c-on leading-[.88] mb-8">Write from <br/><span class="italic text-c-pri">the heart.</span></h1>
-        <p class="au au3 font-body text-lg text-c-on-v max-w-md mb-12 leading-relaxed">Every message is a curated gift. Send via email or WhatsApp, track when it's read, and keep every letter forever.</p>
+        <p class="au au3 font-body text-lg text-c-on-v max-w-md mb-12 leading-relaxed">Every message is a curated gift. Create high-end editorial letters delivered straight to their inbox, and know the moment they open it.</p>
         <div class="au au4 flex flex-col sm:flex-row gap-5">
           <button data-nav="create" class="bg-gradient-to-br from-c-pri to-c-pri-dk text-white px-10 py-4 rounded-full font-label font-bold text-xs uppercase tracking-widest shadow-xl hover:opacity-90 transition-all active:scale-95 border-0 cursor-pointer">Start Creating Your Message</button>
           <button data-nav="inbox" class="text-c-sec font-label font-medium border-b border-c-sec/30 pb-0.5 self-center hover:border-c-sec/70 transition-all text-sm bg-transparent border-0 cursor-pointer">View Sent Messages →</button>
@@ -263,7 +257,7 @@ textarea:focus,input:focus{outline:none;box-shadow:none!important}
         <div class="stat-card text-center"><p class="font-headline text-4xl text-c-pri font-bold" id="stat-total">—</p><p class="font-label text-xs uppercase tracking-widest text-c-sec mt-2">Letters Written</p></div>
         <div class="stat-card text-center"><p class="font-headline text-4xl text-c-pri font-bold" id="stat-sent">—</p><p class="font-label text-xs uppercase tracking-widest text-c-sec mt-2">Delivered</p></div>
         <div class="stat-card text-center"><p class="font-headline text-4xl text-c-pri font-bold" id="stat-read">—</p><p class="font-label text-xs uppercase tracking-widest text-c-sec mt-2">Hearts Opened</p></div>
-        <div class="stat-card text-center"><p class="font-headline text-4xl text-c-wa font-bold" id="stat-wa">—</p><p class="font-label text-xs uppercase tracking-widest text-c-sec mt-2">Via WhatsApp</p></div>
+        <div class="stat-card text-center"><p class="font-headline text-4xl text-c-pri font-bold" id="stat-views">—</p><p class="font-label text-xs uppercase tracking-widest text-c-sec mt-2">Total Views</p></div>
       </div>
     </div>
   </section>
@@ -278,8 +272,8 @@ textarea:focus,input:focus{outline:none;box-shadow:none!important}
         </div>
         <div class="group md:mt-12">
           <div class="w-14 h-14 rounded-full bg-c-white flex items-center justify-center mb-8 sh-float group-hover:bg-c-pri transition-colors duration-500 lift"><span class="material-symbols-outlined text-c-pri group-hover:text-white">send</span></div>
-          <h3 class="font-headline text-xl mb-3">Send via Email or WhatsApp</h3>
-          <p class="font-body text-sm text-c-on-v leading-relaxed">Choose how it arrives. Email brings a beautiful HTML card; WhatsApp delivers instantly.</p>
+          <h3 class="font-headline text-xl mb-3">Send via Email</h3>
+          <p class="font-body text-sm text-c-on-v leading-relaxed">Deliver a beautiful, designed letter straight to their inbox — complete with a song and your signature accent color.</p>
         </div>
         <div class="group md:mt-24">
           <div class="w-14 h-14 rounded-full bg-c-white flex items-center justify-center mb-8 sh-float group-hover:bg-c-pri transition-colors duration-500 lift"><span class="material-symbols-outlined text-c-pri group-hover:text-white">visibility</span></div>
@@ -299,28 +293,18 @@ textarea:focus,input:focus{outline:none;box-shadow:none!important}
       <!-- Sidebar -->
       <aside class="w-full lg:w-72 flex flex-col gap-10 order-2 lg:order-1 lg:sticky lg:top-28">
 
-        <!-- Channel Selector -->
-        <section aria-labelledby="lbl-channel">
-          <p id="lbl-channel" class="font-label text-[10px] uppercase tracking-[.22em] text-c-sec mb-4">Send via</p>
-          <div class="grid grid-cols-2 gap-3">
-            <button class="channel-card flex flex-col items-center gap-2 selected-email" id="ch-email" onclick="selectChannel('email')" aria-pressed="true" aria-label="Send via Email">
-              <span class="material-symbols-outlined text-c-pri" style="font-size:2rem">mail</span>
-              <span class="font-label text-xs font-bold tracking-wider text-c-pri">Email</span>
-            </button>
-            <button class="channel-card flex flex-col items-center gap-2" id="ch-wa" onclick="selectChannel('whatsapp')" aria-pressed="false" aria-label="Send via WhatsApp">
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="16" cy="16" r="16" fill="#25d366"/>
-                <path d="M16 7.5C11.3 7.5 7.5 11.3 7.5 16c0 1.5.4 3 1.1 4.2L7.5 24.5l4.4-1.1c1.2.6 2.6 1 4.1 1 4.7 0 8.5-3.8 8.5-8.5S20.7 7.5 16 7.5zm4.9 11.8c-.2.6-1.2 1.1-1.6 1.2-.4.1-.9.1-2.9-.6-2.5-1-4-3.5-4.1-3.7-.1-.2-1-1.3-1-2.4 0-1.1.6-1.7.8-1.9.2-.2.5-.3.7-.3h.5c.2 0 .4.1.5.4.2.4.8 2 .8 2.1.1.1.1.3 0 .4-.1.1-.1.2-.2.3l-.3.3c-.1.1-.2.2-.1.4.1.2.5.8 1.1 1.3.8.7 1.4.9 1.6 1 .2.1.4 0 .5-.1l.4-.5c.1-.2.3-.2.5-.1l1.5.7c.2.1.4.2.4.4.1.2 0 .9-.1 1.1z" fill="white"/>
-              </svg>
-              <span class="font-label text-xs font-bold tracking-wider" style="color:#25d366">WhatsApp</span>
-            </button>
-          </div>
-          <!-- Contact field changes based on channel -->
-          <div class="mt-4">
-            <label for="f-contact" id="contact-label" class="font-label text-[10px] uppercase tracking-widest text-c-sec mb-2 block">Recipient Email</label>
+        <!-- Recipient Email -->
+        <section aria-labelledby="lbl-contact">
+          <p id="lbl-contact" class="font-label text-[10px] uppercase tracking-[.22em] text-c-sec mb-4">Recipient Email</p>
+          <div class="bg-c-surf-low rounded-xl p-4">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="material-symbols-outlined text-c-pri text-lg">mail</span>
+              <span class="font-label text-xs font-semibold text-c-pri tracking-wider">Sending via Email</span>
+            </div>
+            <label for="f-contact" class="sr-only">Recipient email address</label>
             <input id="f-contact" type="email" placeholder="their@email.com" autocomplete="off"
-              class="w-full bg-c-surf-low border border-c-out-v rounded-xl px-4 py-3 font-body text-sm text-c-on focus:border-c-pri transition-colors"/>
-            <p id="e-contact" class="emsg" role="alert">Please enter a valid contact.</p>
+              class="w-full bg-c-white border border-c-out-v rounded-xl px-4 py-3 font-body text-sm text-c-on focus:border-c-pri transition-colors"/>
+            <p id="e-contact" class="emsg" role="alert">Please enter a valid email address.</p>
           </div>
         </section>
 
@@ -387,7 +371,7 @@ textarea:focus,input:focus{outline:none;box-shadow:none!important}
 
         <!-- API config notice -->
         <div id="api-notice" class="api-alert mb-8 hidden">
-          <strong>⚙️ Backend not connected.</strong> Running in offline mode — letters will download locally but won't be sent via email or WhatsApp.
+          <strong>⚙️ Backend not connected.</strong> Running in offline mode — letters will download locally but won't be sent via email.
           <a href="#" onclick="showPage('setup')" class="underline font-semibold ml-1">Configure backend →</a>
         </div>
 
@@ -461,8 +445,6 @@ textarea:focus,input:focus{outline:none;box-shadow:none!important}
           <button class="fpill px-5 py-2 rounded-full bg-c-surf-low text-c-sec font-label text-xs uppercase tracking-widest" data-ifilter="read" aria-pressed="false">Read</button>
           <button class="fpill px-5 py-2 rounded-full bg-c-surf-low text-c-sec font-label text-xs uppercase tracking-widest" data-ifilter="failed" aria-pressed="false">Failed</button>
           <button class="fpill px-5 py-2 rounded-full bg-c-surf-low text-c-sec font-label text-xs uppercase tracking-widest" data-ifilter="scheduled" aria-pressed="false">Scheduled</button>
-          <button class="fpill px-5 py-2 rounded-full bg-c-surf-low text-c-sec font-label text-xs uppercase tracking-widest" data-ifilter="email" aria-pressed="false">Email</button>
-          <button class="fpill px-5 py-2 rounded-full bg-c-surf-low text-c-sec font-label text-xs uppercase tracking-widest" data-ifilter="whatsapp" aria-pressed="false">WhatsApp</button>
         </div>
         <div class="md:ml-auto">
           <button onclick="loadInbox()" class="font-label text-xs uppercase tracking-widest text-c-sec hover:text-c-pri flex items-center gap-2 border-0 bg-transparent cursor-pointer transition-colors">
@@ -598,6 +580,35 @@ textarea:focus,input:focus{outline:none;box-shadow:none!important}
   </div>
 </div>
 
+<!-- ═══════ MODAL: ADMIN LOGIN ═══════ -->
+<div id="admin-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="admin-title">
+  <div class="bg-c-white rounded-2xl sh-canvas max-w-sm w-full p-10 relative">
+    <button class="modal-close absolute top-5 right-5 text-c-sec hover:text-c-pri transition-colors border-0 bg-transparent cursor-pointer" data-close="admin" aria-label="Close"><span class="material-symbols-outlined">close</span></button>
+    <div class="flex items-center gap-3 mb-6">
+      <div class="w-10 h-10 rounded-full bg-c-surf-mid flex items-center justify-center">
+        <span class="material-symbols-outlined text-c-sec">lock</span>
+      </div>
+      <div>
+        <h2 id="admin-title" class="font-headline text-xl text-c-on">Admin Access</h2>
+        <p class="font-body text-xs text-c-sec mt-0.5">Settings are password protected</p>
+      </div>
+    </div>
+    <div class="mb-4">
+      <label for="admin-password" class="font-label text-[10px] uppercase tracking-widest text-c-sec mb-2 block">Password</label>
+      <input id="admin-password" type="password" placeholder="Enter admin password"
+        class="w-full border border-c-out-v rounded-xl px-4 py-3 font-body text-sm text-c-on focus:border-c-pri transition-colors bg-c-bg"
+        autocomplete="current-password"/>
+      <p id="admin-error" class="text-c-pri text-xs mt-2 hidden">Incorrect password. Try again.</p>
+    </div>
+    <button onclick="submitAdminLogin()" class="w-full bg-gradient-to-r from-c-pri to-c-pri-dk text-white rounded-full py-3.5 font-label font-bold text-xs uppercase tracking-widest shadow-md active:scale-95 transition-all border-0 cursor-pointer">
+      Unlock Settings
+    </button>
+    <p class="font-body text-[10px] text-c-sec text-center mt-4 leading-relaxed">
+      Set your password via <code class="bg-c-surf-low px-1 rounded">ADMIN_PASSWORD</code> in Render environment variables.
+    </p>
+  </div>
+</div>
+
 <!-- ═══════ TOAST ═══════ -->
 <div id="toast" role="status" aria-live="polite" aria-atomic="true" class="fixed bottom-8 left-1/2 z-[400] pointer-events-none" style="transform:translateX(-50%) translateY(8px);opacity:0;transition:opacity .3s,transform .3s">
   <div id="toast-txt" class="bg-c-inv text-c-inv-on px-7 py-3.5 rounded-full font-label text-xs uppercase tracking-widest shadow-2xl whitespace-nowrap"></div>
@@ -609,7 +620,7 @@ textarea:focus,input:focus{outline:none;box-shadow:none!important}
     <div class="mb-12">
       <p class="font-label text-xs uppercase tracking-[.22em] text-c-sec mb-3">Configuration</p>
       <h1 class="font-headline text-4xl text-c-on">Settings</h1>
-      <p class="font-body text-c-on-v text-sm mt-3 leading-relaxed">Configure your email and WhatsApp credentials. These are saved to the database and override your <code>.env</code> file at runtime.</p>
+      <p class="font-body text-c-on-v text-sm mt-3 leading-relaxed">Configure your email credentials. These are saved to the database and take effect immediately.</p>
     </div>
 
     <!-- Status banner -->
@@ -655,39 +666,6 @@ textarea:focus,input:focus{outline:none;box-shadow:none!important}
       </div>
     </section>
 
-    <!-- WhatsApp Config -->
-    <section class="bg-c-white rounded-2xl sh-float p-8 mb-6 border border-c-out-v/20" aria-labelledby="wa-settings-heading">
-      <div class="flex items-center gap-3 mb-6">
-        <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background:#dcf8c6">
-          <svg width="20" height="20" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#25d366"/><path d="M16 7.5C11.3 7.5 7.5 11.3 7.5 16c0 1.5.4 3 1.1 4.2L7.5 24.5l4.4-1.1c1.2.6 2.6 1 4.1 1 4.7 0 8.5-3.8 8.5-8.5S20.7 7.5 16 7.5zm4.9 11.8c-.2.6-1.2 1.1-1.6 1.2-.4.1-.9.1-2.9-.6-2.5-1-4-3.5-4.1-3.7-.1-.2-1-1.3-1-2.4 0-1.1.6-1.7.8-1.9.2-.2.5-.3.7-.3h.5c.2 0 .4.1.5.4.2.4.8 2 .8 2.1.1.1.1.3 0 .4-.1.1-.1.2-.2.3l-.3.3c-.1.1-.2.2-.1.4.1.2.5.8 1.1 1.3.8.7 1.4.9 1.6 1 .2.1.4 0 .5-.1l.4-.5c.1-.2.3-.2.5-.1l1.5.7c.2.1.4.2.4.4.1.2 0 .9-.1 1.1z" fill="white"/></svg>
-        </div>
-        <div><h2 id="wa-settings-heading" class="font-headline text-xl">WhatsApp (Twilio)</h2><p class="font-body text-xs text-c-sec mt-0.5">Free sandbox at twilio.com — recipient must join sandbox once</p></div>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label for="cfg-twilio-sid" class="font-label text-[10px] uppercase tracking-widest text-c-sec mb-2 block">Account SID</label>
-          <input id="cfg-twilio-sid" type="text" placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" class="w-full border border-c-out-v rounded-xl px-4 py-3 font-body text-sm font-mono text-c-on focus:border-c-pri transition-colors bg-c-bg"/>
-        </div>
-        <div>
-          <label for="cfg-twilio-token" class="font-label text-[10px] uppercase tracking-widest text-c-sec mb-2 block">Auth Token</label>
-          <input id="cfg-twilio-token" type="password" placeholder="your_auth_token" class="w-full border border-c-out-v rounded-xl px-4 py-3 font-body text-sm text-c-on focus:border-c-pri transition-colors bg-c-bg"/>
-        </div>
-        <div class="md:col-span-2">
-          <label for="cfg-twilio-from" class="font-label text-[10px] uppercase tracking-widest text-c-sec mb-2 block">WhatsApp From Number</label>
-          <input id="cfg-twilio-from" type="text" placeholder="whatsapp:+14155238886" class="w-full border border-c-out-v rounded-xl px-4 py-3 font-body text-sm font-mono text-c-on focus:border-c-pri transition-colors bg-c-bg"/>
-        </div>
-      </div>
-      <div class="mt-5 pt-5 border-t border-c-out-v/20 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-        <div class="flex-1">
-          <label for="test-wa-to" class="font-label text-[10px] uppercase tracking-widest text-c-sec mb-2 block">Send test to (E.164 format)</label>
-          <input id="test-wa-to" type="tel" placeholder="+2348012345678" class="w-full border border-c-out-v rounded-xl px-4 py-2.5 font-body text-sm text-c-on focus:border-c-pri transition-colors bg-c-bg"/>
-        </div>
-        <button onclick="testWhatsApp()" class="flex items-center gap-2 px-6 py-2.5 rounded-full font-label text-xs uppercase tracking-widest hover:opacity-80 transition-opacity border-0 cursor-pointer mt-5 sm:mt-0 whitespace-nowrap" style="background:#25d366;color:#fff">
-          <span class="material-symbols-outlined text-sm">send</span> Send Test
-        </button>
-      </div>
-    </section>
-
     <!-- App URL -->
     <section class="bg-c-white rounded-2xl sh-float p-8 mb-8 border border-c-out-v/20" aria-labelledby="app-settings-heading">
       <h2 id="app-settings-heading" class="font-headline text-xl mb-4">App URL</h2>
@@ -708,7 +686,7 @@ textarea:focus,input:focus{outline:none;box-shadow:none!important}
   <div class="max-w-7xl mx-auto px-6 md:px-12 py-12 flex flex-col md:flex-row justify-between items-center gap-6">
     <span class="font-headline italic text-c-sec">The Editorial Muse</span>
     <nav class="flex gap-8"><a href="#" class="font-label text-[11px] uppercase tracking-widest text-c-sec hover:underline decoration-c-pri underline-offset-4">Instagram</a><a href="#" class="font-label text-[11px] uppercase tracking-widest text-c-sec hover:underline decoration-c-pri underline-offset-4">Privacy</a></nav>
-    <p class="font-label text-[11px] uppercase tracking-widest text-c-sec/50">© 2025 The Editorial Muse.</p>
+    <p class="font-label text-[11px] uppercase tracking-widest text-c-sec/50">© 2024 The Editorial Muse.</p>
   </div>
 </footer>
 
@@ -728,7 +706,7 @@ const S = {
   musicPlaying:false, audioCtx:null, nodes:[], ticker:null, toastTimer:null,
   modalOpen:null, fmt:{bold:false,italic:false,center:false},
   inboxMessages:[], inboxFilter:'all', inboxSearch:'', inboxPage:1, inboxTotalPages:1,
-  backendOnline:false,
+  backendOnline:false, adminUnlocked:false,
 };
 
 /* ══════════════════════════════════════
@@ -768,7 +746,14 @@ function showPage(id, pushState=true) {
   window.scrollTo({ top:0, behavior:'smooth' });
   if (id === 'inbox')    { S.inboxPage=1; loadInbox(); }
   if (id === 'home')     loadStats();
-  if (id === 'settings') loadSettings();
+  if (id === 'settings') {
+    // Settings is admin-only — require password
+    if (!S.adminUnlocked) {
+      openAdminLogin();
+      return;
+    }
+    loadSettings();
+  }
 }
 
 function updateNavState(id) {
@@ -870,29 +855,32 @@ function closeModal(id) {
 }
 
 /* ══════════════════════════════════════
-   CHANNEL SELECTION
+   VALIDATION
 ══════════════════════════════════════ */
-function selectChannel(ch) {
-  S.channel = ch;
-  document.getElementById('ch-email').classList.toggle('selected-email', ch==='email');
-  document.getElementById('ch-email').setAttribute('aria-pressed', ch==='email');
-  document.getElementById('ch-wa').classList.toggle('selected-wa', ch==='whatsapp');
-  document.getElementById('ch-wa').setAttribute('aria-pressed', ch==='whatsapp');
-  // Update contact field
-  const label = document.getElementById('contact-label');
-  const input = document.getElementById('f-contact');
-  if (ch === 'email') {
-    label.textContent = 'Recipient Email';
-    input.type = 'email'; input.placeholder = 'their@email.com';
-  } else {
-    label.textContent = 'Recipient WhatsApp Number';
-    input.type = 'tel'; input.placeholder = '+234 801 234 5678';
+function validate() {
+  const contact = document.getElementById('f-contact').value.trim();
+  const fields = [
+    { fid:'f-to',      eid:'e-to',      val: document.getElementById('f-to').value.trim() },
+    { fid:'f-body',    eid:'e-body',    val: document.getElementById('f-body').value.trim() },
+    { fid:'f-from',    eid:'e-from',    val: document.getElementById('f-from').value.trim() },
+    { fid:'f-contact', eid:'e-contact', val: contact },
+  ];
+  let ok = true;
+  fields.forEach(({ fid, eid, val }) => {
+    const f = document.getElementById(fid), e = document.getElementById(eid);
+    if (!val) { f.classList.add('ferr'); e.classList.add('on'); ok = false; }
+    else      { f.classList.remove('ferr'); e.classList.remove('on'); }
+  });
+  // Email format check
+  if (contact && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact)) {
+    document.getElementById('f-contact').classList.add('ferr');
+    document.getElementById('e-contact').textContent = 'Please enter a valid email address.';
+    document.getElementById('e-contact').classList.add('on');
+    ok = false;
   }
+  if (!ok) toast('Please fill all fields ✍️');
+  return ok;
 }
-
-/* ══════════════════════════════════════
-   MUSIC
-══════════════════════════════════════ */
 const SONGS=[
   {name:'Moonlight Sonata',notes:[261.6,311.1,392,311.1,261.6,311.1,392,311.1,246.9,311.1,392,311.1],tempo:420,wave:'sine',gain:.16},
   {name:'At Last',notes:[349.2,392,440,523.2,493.8,440,392,349.2,329.6,293.6,349.2,392],tempo:520,wave:'triangle',gain:.18},
@@ -941,7 +929,9 @@ function validate() {
   if(!ok) toast('Please fill all fields ✍️');
   return ok;
 }
-['f-to','f-body','f-from','f-contact'].forEach(id=>{
+/* ══════════════════════════════════════
+   MUSIC
+══════════════════════════════════════ */
   const el=document.getElementById(id);
   if(!el) return;
   const em={'f-to':'e-to','f-body':'e-body','f-from':'e-from','f-contact':'e-contact'};
@@ -959,8 +949,7 @@ function openPreview(){
   document.getElementById('prev-song').textContent=S.song!==null?'♪ '+SONGS[S.song].name:'No song selected';
   document.getElementById('prev-contact').textContent=contact;
   const badge=document.getElementById('prev-channel-badge');
-  if(S.channel==='email'){badge.innerHTML='<span class="material-symbols-outlined text-c-pri text-sm">mail</span><span class="text-c-pri font-semibold">Sending via Email</span>';}
-  else{badge.innerHTML='<span style="color:#25d366;font-weight:700;font-size:.75rem;letter-spacing:.06em">● WhatsApp</span>';}
+  if(badge) badge.innerHTML='<span class="material-symbols-outlined text-c-pri text-sm">mail</span><span class="text-c-pri font-semibold text-xs">Sending via Email</span>';
   openModal('preview');
 }
 
@@ -1001,7 +990,7 @@ async function doSend(){
     song:       S.song!==null ? SONGS[S.song].name : null,
     accent:     S.accent,
     font:       S.font,
-    channel:    S.channel,
+    channel:    'email',
     ...(scheduledAt && { scheduled_at: scheduledAt }),
   };
 
@@ -1033,13 +1022,9 @@ async function doSend(){
 function openSentFlow(toName, viewUrl, isScheduled=false){
   document.getElementById('sent-recip').textContent = toName ? 'to '+toName : '';
   const chInfo = document.getElementById('sent-channel-info');
-  if (isScheduled) {
-    chInfo.textContent = '⏰ Your letter is scheduled and will be delivered automatically.';
-  } else {
-    chInfo.textContent = S.channel==='email'
-      ? '💌 A beautiful letter has landed in their inbox.'
-      : '💬 Your message was delivered to their WhatsApp.';
-  }
+  chInfo.textContent = isScheduled
+    ? '⏰ Your letter is scheduled and will be delivered automatically.'
+    : '💌 A beautiful letter has landed in their inbox.';
   const linkEl = document.getElementById('sent-view-link');
   if (viewUrl && !isScheduled) { linkEl.textContent='🔗 '+viewUrl; linkEl.style.display='block'; }
   else linkEl.style.display='none';
@@ -1094,12 +1079,10 @@ async function loadInbox(resetPage=true){
     const limit   = 10;
 
     // Determine if filter is a status or channel
-    const isChannel  = ['email','whatsapp'].includes(filter);
     const isStatus   = ['sent','read','failed','draft','scheduled'].includes(filter);
     const params = new URLSearchParams({ page, limit });
-    if (isStatus)  params.set('status',  filter);
-    if (isChannel) params.set('channel', filter);
-    if (search)    params.set('q', search);
+    if (isStatus) params.set('status', filter);
+    if (search)   params.set('q', search);
 
     const res  = await fetch(`${API_BASE}/messages?${params}`);
     const data = await res.json();
@@ -1135,9 +1118,7 @@ function renderInboxList(messages, pagination, empty, list, pgBar) {
 
   list.innerHTML = messages.map(m => {
     const badge = statusBadges[m.status] || `<span class="status-badge badge-draft">${esc(m.status)}</span>`;
-    const chIcon = m.channel === 'whatsapp'
-      ? `<svg width="18" height="18" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="#25d366"/><path d="M16 7.5C11.3 7.5 7.5 11.3 7.5 16c0 1.5.4 3 1.1 4.2L7.5 24.5l4.4-1.1c1.2.6 2.6 1 4.1 1 4.7 0 8.5-3.8 8.5-8.5S20.7 7.5 16 7.5zm4.9 11.8c-.2.6-1.2 1.1-1.6 1.2-.4.1-.9.1-2.9-.6-2.5-1-4-3.5-4.1-3.7-.1-.2-1-1.3-1-2.4 0-1.1.6-1.7.8-1.9.2-.2.5-.3.7-.3h.5c.2 0 .4.1.5.4.2.4.8 2 .8 2.1.1.1.1.3 0 .4-.1.1-.1.2-.2.3l-.3.3c-.1.1-.2.2-.1.4.1.2.5.8 1.1 1.3.8.7 1.4.9 1.6 1 .2.1.4 0 .5-.1l.4-.5c.1-.2.3-.2.5-.1l1.5.7c.2.1.4.2.4.4.1.2 0 .9-.1 1.1z" fill="white"/></svg>`
-      : '<span class="material-symbols-outlined text-c-sec" style="font-size:1rem">mail</span>';
+    const chIcon = '<span class="material-symbols-outlined text-c-pri" style="font-size:1rem">mail</span>';
     const date  = new Date(m.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
     const views = m.view_count > 0
       ? `<span class="flex items-center gap-1 text-[10px] text-c-sec"><span class="material-symbols-outlined" style="font-size:.85rem">visibility</span>${m.view_count}</span>` : '';
@@ -1316,9 +1297,9 @@ async function loadStats(){
     const st   = data.stats || {};
     const set  = (id,v) => { const el=document.getElementById(id); if(el) el.textContent = v ?? '0'; };
     set('stat-total', st.total);
-    set('stat-sent',  (st.sent||0) + (st.read||0)); // sent includes read
+    set('stat-sent',  (st.sent||0) + (st.read||0));
     set('stat-read',  st.read);
-    set('stat-wa',    st.via_whatsapp);
+    set('stat-views', st.total_views);
   } catch(_) {}
 }
 
@@ -1332,16 +1313,12 @@ async function loadSettings() {
     const data = await res.json();
     const s    = data.settings || {};
     const set  = (id, val) => { const el=document.getElementById(id); if(el && val) el.value=val; };
-    set('cfg-email-user',   s.EMAIL_USER);
-    set('cfg-email-host',   s.EMAIL_HOST   || 'smtp.gmail.com');
-    set('cfg-email-port',   s.EMAIL_PORT   || '587');
-    set('cfg-email-from',   s.EMAIL_FROM);
-    set('cfg-twilio-sid',   s.TWILIO_ACCOUNT_SID);
-    set('cfg-twilio-from',  s.TWILIO_WHATSAPP_FROM);
-    set('cfg-app-url',      s.APP_URL);
-    // Password fields show placeholder if set
-    if (s.EMAIL_PASS)        document.getElementById('cfg-email-pass').placeholder   = '(saved — leave blank to keep)';
-    if (s.TWILIO_AUTH_TOKEN) document.getElementById('cfg-twilio-token').placeholder = '(saved — leave blank to keep)';
+    set('cfg-email-user', s.EMAIL_USER);
+    set('cfg-email-host', s.EMAIL_HOST || 'smtp.gmail.com');
+    set('cfg-email-port', s.EMAIL_PORT || '587');
+    set('cfg-email-from', s.EMAIL_FROM);
+    set('cfg-app-url',    s.APP_URL);
+    if (s.EMAIL_PASS) document.getElementById('cfg-email-pass').placeholder = '(saved — leave blank to keep)';
   } catch(_) {}
 }
 
@@ -1352,19 +1329,14 @@ async function saveSettings() {
   btn.disabled = true; txt.textContent = 'Saving…';
 
   const payload = {
-    EMAIL_HOST:             document.getElementById('cfg-email-host').value.trim(),
-    EMAIL_PORT:             document.getElementById('cfg-email-port').value.trim(),
-    EMAIL_USER:             document.getElementById('cfg-email-user').value.trim(),
-    EMAIL_FROM:             document.getElementById('cfg-email-from').value.trim(),
-    APP_URL:                document.getElementById('cfg-app-url').value.trim(),
-    TWILIO_ACCOUNT_SID:     document.getElementById('cfg-twilio-sid').value.trim(),
-    TWILIO_WHATSAPP_FROM:   document.getElementById('cfg-twilio-from').value.trim(),
+    EMAIL_HOST: document.getElementById('cfg-email-host').value.trim(),
+    EMAIL_PORT: document.getElementById('cfg-email-port').value.trim(),
+    EMAIL_USER: document.getElementById('cfg-email-user').value.trim(),
+    EMAIL_FROM: document.getElementById('cfg-email-from').value.trim(),
+    APP_URL:    document.getElementById('cfg-app-url').value.trim(),
   };
-  // Only include passwords if user typed something new
-  const emailPass  = document.getElementById('cfg-email-pass').value;
-  const twilioTok  = document.getElementById('cfg-twilio-token').value;
+  const emailPass = document.getElementById('cfg-email-pass').value;
   if (emailPass && emailPass !== '••••••••') payload.EMAIL_PASS = emailPass;
-  if (twilioTok && twilioTok !== '••••••••') payload.TWILIO_AUTH_TOKEN = twilioTok;
 
   try {
     const res  = await fetch(API_BASE+'/settings', {
@@ -1372,10 +1344,8 @@ async function saveSettings() {
     });
     const data = await res.json();
     if (!data.success) throw new Error(data.error);
-    showSettingsStatus(`✓ Saved ${data.saved.length} setting(s) successfully. Changes take effect immediately.`, 'success');
-    // Clear password fields
-    document.getElementById('cfg-email-pass').value  = '';
-    document.getElementById('cfg-twilio-token').value = '';
+    showSettingsStatus(`✓ Saved ${data.saved.length} setting(s). Changes take effect immediately.`, 'success');
+    document.getElementById('cfg-email-pass').value = '';
   } catch(e) {
     showSettingsStatus('❌ Save failed: ' + e.message, 'error');
   } finally {
@@ -1390,23 +1360,6 @@ async function testEmail() {
   toast('Sending test email… ⏳');
   try {
     const res  = await fetch(API_BASE+'/settings/test-email', {
-      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ to }),
-    });
-    const data = await res.json();
-    if (!data.success) throw new Error(data.error);
-    showSettingsStatus('✓ ' + data.message, 'success');
-  } catch(e) {
-    showSettingsStatus('❌ ' + e.message, 'error');
-  }
-}
-
-async function testWhatsApp() {
-  if (!S.backendOnline) { showSettingsStatus('Backend not connected.', 'error'); return; }
-  const to = document.getElementById('test-wa-to').value.trim();
-  if (!to) { toast('Enter a phone number first (e.g. +2348012345678).'); return; }
-  toast('Sending test WhatsApp… ⏳');
-  try {
-    const res  = await fetch(API_BASE+'/settings/test-whatsapp', {
       method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ to }),
     });
     const data = await res.json();
@@ -1532,8 +1485,48 @@ function downloadLetter(fmt) {
 }
 
 /* ══════════════════════════════════════
-   INIT
+   ADMIN LOGIN — protects settings page
 ══════════════════════════════════════ */
+function openAdminLogin() {
+  document.getElementById('admin-password').value = '';
+  document.getElementById('admin-error').classList.add('hidden');
+  openModal('admin');
+  setTimeout(() => document.getElementById('admin-password').focus(), 100);
+}
+
+async function submitAdminLogin() {
+  const pwd = document.getElementById('admin-password').value;
+  if (!pwd) return;
+
+  try {
+    const res  = await fetch(API_BASE + '/admin/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pwd }),
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      S.adminUnlocked = true;
+      S.adminPassword = pwd; // store for authenticated API calls
+      closeModal('admin');
+      // Now actually navigate to settings
+      showPage('settings');
+    } else {
+      document.getElementById('admin-error').classList.remove('hidden');
+      document.getElementById('admin-password').value = '';
+      document.getElementById('admin-password').focus();
+    }
+  } catch(e) {
+    // If backend offline, use a simple local check
+    document.getElementById('admin-error').classList.remove('hidden');
+  }
+}
+
+// Allow pressing Enter in the password field
+document.getElementById('admin-password').addEventListener('keydown', e => {
+  if (e.key === 'Enter') submitAdminLogin();
+});
 (async function init() {
   // Read page from URL hash on load (supports bookmarking + refresh)
   const hashPage = window.location.hash.replace('#','');

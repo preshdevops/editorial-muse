@@ -4,7 +4,7 @@
 const express        = require('express');
 const { v4: uuidv4 } = require('uuid');
 const db             = require('./db');
-const { sendEmail }  = require('./emailService');
+const { sendEmail, encryptBody, decryptBody } = require('./emailService');
 
 const router = express.Router();
 
@@ -111,7 +111,7 @@ router.post('/messages', (req, res) => {
       to_name:      req.body.to_name.trim(),
       to_contact:   req.body.to_contact.trim(),
       from_name:    req.body.from_name.trim(),
-      body:         req.body.body.trim(),
+      body:         encryptBody(req.body.body.trim()),
       song:         req.body.song   || null,
       accent:       req.body.accent || '#ae1417',
       font:         req.body.font   || 'serif',
@@ -132,7 +132,7 @@ router.post('/messages/:id/send', rateLimiter, async (req, res) => {
 
   try {
     const viewUrl = buildViewUrl(msg.view_token);
-    await sendEmail({ ...msg, viewUrl });
+    await sendEmail({ ...msg, body: decryptBody(msg.body), viewUrl });
     db.markSent(msg.id);
     ok(res, { message: 'Sent successfully', view_url: viewUrl });
   } catch (e) {
@@ -149,7 +149,7 @@ router.post('/messages/:id/resend', rateLimiter, async (req, res) => {
 
   try {
     const viewUrl = buildViewUrl(msg.view_token);
-    await sendEmail({ ...msg, viewUrl });
+    await sendEmail({ ...msg, body: decryptBody(msg.body), viewUrl });
     db.markSent(msg.id);
     ok(res, { message: 'Resent successfully', view_url: viewUrl });
   } catch (e) {
@@ -172,7 +172,7 @@ router.post('/send', rateLimiter, async (req, res) => {
     to_name:      req.body.to_name.trim(),
     to_contact:   req.body.to_contact.trim(),
     from_name:    req.body.from_name.trim(),
-    body:         req.body.body.trim(),
+    body:         encryptBody(req.body.body.trim()),
     song:         req.body.song   || null,
     accent:       req.body.accent || '#ae1417',
     font:         req.body.font   || 'serif',
@@ -195,7 +195,7 @@ router.post('/send', rateLimiter, async (req, res) => {
   // Immediate send
   try {
     db.insertMessage(msgData);
-    await sendEmail({ ...msgData, viewUrl });
+    await sendEmail({ ...msgData, body: decryptBody(msgData.body), viewUrl });
     db.markSent(id);
     ok(res, { id, view_token, view_url: viewUrl, status: 'sent' });
   } catch (e) {
@@ -293,6 +293,7 @@ router.get('/view/:token', (req, res) => {
 
   db.recordView(req.params.token);
 
+  const decryptedBody = decryptBody(msg.body);
   const accent   = msg.accent || '#ae1417';
   const songHtml = msg.song && msg.song !== 'No song selected'
     ? `<div class="song">♪ <em>${esc(msg.song)}</em></div>` : '';
@@ -330,7 +331,7 @@ router.get('/view/:token', (req, res) => {
   <div class="card">
     <p class="to">${esc(msg.to_name)},</p>
     <div class="rule"></div>
-    <p class="body">${esc(msg.body)}</p>
+    <p class="body">${esc(decryptedBody)}</p>
     ${songHtml}
     <div class="sig-wrap">
       <p class="sig-lbl">With all my love,</p>

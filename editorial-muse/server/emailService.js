@@ -1,47 +1,46 @@
-// server/emailService.js — using Resend API (fast, reliable, no SMTP timeouts)
+// server/emailService.js — using Nodemailer with Brevo SMTP
 'use strict';
 
-const https = require('https');
+const nodemailer = require('nodemailer');
+const crypto     = require('crypto');
 
-// ── Send via Resend API ───────────────────────────────────────────────────────
-function resendRequest(payload) {
-  return new Promise((resolve, reject) => {
-    const apiKey = process.env.RESEND_API_KEY;
-    if (!apiKey) throw new Error('RESEND_API_KEY not set in environment variables');
+// ── Encryption helpers ────────────────────────────────────────────────────────
+function getSecret() {
+  const s = process.env.LETTER_SECRET;
+  if (!s) throw new Error('LETTER_SECRET not set in environment variables');
+  return crypto.createHash('sha256').update(s).digest();
+}
 
-    const body = JSON.stringify(payload);
-    const options = {
-      hostname: 'api.resend.com',
-      path:     '/emails',
-      method:   'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type':  'application/json',
-        'Content-Length': Buffer.byteLength(body),
-      },
-    };
+function encryptBody(text) {
+  const key = getSecret();
+  const iv  = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+  const encrypted = Buffer.concat([cipher.update(text, 'utf8'), cipher.final()]);
+  return iv.toString('hex') + ':' + encrypted.toString('hex');
+}
 
-    const req = https.request(options, res => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        try {
-          const parsed = JSON.parse(data);
-          if (res.statusCode >= 200 && res.statusCode < 300) {
-            resolve(parsed);
-          } else {
-            reject(new Error(parsed.message || parsed.name || `Resend error ${res.statusCode}`));
-          }
-        } catch (e) {
-          reject(new Error('Invalid Resend response'));
-        }
-      });
-    });
+function decryptBody(stored) {
+  const key = getSecret();
+  const [ivHex, encHex] = stored.split(':');
+  const iv        = Buffer.from(ivHex,  'hex');
+  const encrypted = Buffer.from(encHex, 'hex');
+  const decipher  = crypto.createDecipheriv('aes-256-cbc', key, iv);
+  return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString('utf8');
+}
 
-    req.on('error', reject);
-    req.setTimeout(15000, () => { req.destroy(); reject(new Error('Resend request timed out')); });
-    req.write(body);
-    req.end();
+// ── Create transporter ────────────────────────────────────────────────────────
+function createTransporter() {
+  const password = process.env.BREVO_SMTP_PASSWORD;
+  if (!password) throw new Error('BREVO_SMTP_PASSWORD not set in environment variables');
+
+  return nodemailer.createTransport({
+    host:   'smtp-relay.brevo.com',
+    port:   587,
+    secure: false,
+    auth: {
+      user: 'a5aaf0001@smtp-brevo.com',
+      pass: password,
+    },
   });
 }
 
@@ -107,28 +106,34 @@ function esc(str) {
 
 // ── Main send function ────────────────────────────────────────────────────────
 async function sendEmail({ to_contact, to_name, from_name, body, song, accent, viewUrl }) {
-  const fromAddress = process.env.EMAIL_FROM || 'The Editorial Muse <onboarding@resend.dev>';
+  const fromAddress = process.env.EMAIL_FROM || 'The Editorial Muse <a5aaf0001@smtp-brevo.com>';
+  const transporter = createTransporter();
 
-  const payload = {
+  const mailOptions = {
     from:    fromAddress,
-    to:      [to_contact],
+    to:      to_contact,
     subject: `${from_name} wrote you a letter 💌`,
     text:    `${to_name},\n\n${body}\n\nWith all my love,\n${from_name}\n\n${song ? '♪ ' + song + '\n\n' : ''}Open the beautiful version: ${viewUrl}`,
     html:    buildEmailHtml({ to_name, from_name, body, song, accent, viewUrl }),
   };
 
-  const result = await resendRequest(payload);
-  console.log(`[Email] ✓ Sent to ${to_contact} — ID: ${result.id}`);
+  const result = await transporter.sendMail(mailOptions);
+  console.log(`[Email] ✓ Sent to ${to_contact} — ID: ${result.messageId}`);
   return result;
 }
 
-// Kept for compatibility with index.js import
+// ── Warm up / env check ───────────────────────────────────────────────────────
 function warmUpEmail() {
-  if (!process.env.RESEND_API_KEY) {
-    console.warn('[Email] RESEND_API_KEY not set — email sending will fail');
+  if (!process.env.BREVO_SMTP_PASSWORD) {
+    console.warn('[Email] BREVO_SMTP_PASSWORD not set — email sending will fail');
   } else {
-    console.log('[Email] Resend API ready ✓');
+    console.log('[Email] Brevo SMTP ready ✓');
+  }
+  if (!process.env.LETTER_SECRET) {
+    console.warn('[Email] LETTER_SECRET not set — letter encryption will fail');
+  } else {
+    console.log('[Email] Letter encryption ready ✓');
   }
 }
 
-module.exports = { sendEmail, warmUpEmail };
+module.exports = { sendEmail, warmUpEmail, encryptBody, decryptBody };

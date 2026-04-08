@@ -1,8 +1,8 @@
-// server/emailService.js — using Nodemailer with Brevo SMTP
+// server/emailService.js — using official Brevo SDK
 'use strict';
 
-const nodemailer = require('nodemailer');
-const crypto     = require('crypto');
+const { BrevoClient } = require('@getbrevo/brevo');
+const crypto          = require('crypto');
 
 // ── Encryption helpers ────────────────────────────────────────────────────────
 function getSecret() {
@@ -26,25 +26,6 @@ function decryptBody(stored) {
   const encrypted = Buffer.from(encHex, 'hex');
   const decipher  = crypto.createDecipheriv('aes-256-cbc', key, iv);
   return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString('utf8');
-}
-
-// ── Create transporter ────────────────────────────────────────────────────────
-function createTransporter() {
-  const password = process.env.BREVO_SMTP_PASSWORD;
-  if (!password) throw new Error('BREVO_SMTP_PASSWORD not set in environment variables');
-
-  return nodemailer.createTransport({
-    host:   'smtp-relay.brevo.com',
-    port:   465,
-    secure: true,
-    auth: {
-      user: 'a5aaf0001@smtp-brevo.com',
-      pass: password,
-    },
-    connectionTimeout: 10000,
-    greetingTimeout:   10000,
-    socketTimeout:     15000,
-  });
 }
 
 // ── HTML email template ───────────────────────────────────────────────────────
@@ -109,28 +90,32 @@ function esc(str) {
 
 // ── Main send function ────────────────────────────────────────────────────────
 async function sendEmail({ to_contact, to_name, from_name, body, song, accent, viewUrl }) {
-  const fromAddress = process.env.EMAIL_FROM || 'The Editorial Muse <a5aaf0001@smtp-brevo.com>';
-  const transporter = createTransporter();
+  const apiKey = process.env.BREVO_API_KEY;
+  if (!apiKey) throw new Error('BREVO_API_KEY not set in environment variables');
 
-  const mailOptions = {
-    from:    fromAddress,
-    to:      to_contact,
-    subject: `${from_name} wrote you a letter 💌`,
-    text:    `${to_name},\n\n${body}\n\nWith all my love,\n${from_name}\n\n${song ? '♪ ' + song + '\n\n' : ''}Open the beautiful version: ${viewUrl}`,
-    html:    buildEmailHtml({ to_name, from_name, body, song, accent, viewUrl }),
-  };
+  const fromEmail = process.env.EMAIL_FROM_ADDRESS || 'editorialmuse07@gmail.com';
+  const fromName  = 'The Editorial Muse';
 
-  const result = await transporter.sendMail(mailOptions);
+  const brevo = new BrevoClient({ apiKey });
+
+  const result = await brevo.transactionalEmails.sendTransacEmail({
+    sender:      { name: fromName, email: fromEmail },
+    to:          [{ email: to_contact, name: to_name }],
+    subject:     `${from_name} wrote you a letter 💌`,
+    textContent: `${to_name},\n\n${body}\n\nWith all my love,\n${from_name}\n\n${song ? '♪ ' + song + '\n\n' : ''}Open the beautiful version: ${viewUrl}`,
+    htmlContent: buildEmailHtml({ to_name, from_name, body, song, accent, viewUrl }),
+  });
+
   console.log(`[Email] ✓ Sent to ${to_contact} — ID: ${result.messageId}`);
   return result;
 }
 
 // ── Warm up / env check ───────────────────────────────────────────────────────
 function warmUpEmail() {
-  if (!process.env.BREVO_SMTP_PASSWORD) {
-    console.warn('[Email] BREVO_SMTP_PASSWORD not set — email sending will fail');
+  if (!process.env.BREVO_API_KEY) {
+    console.warn('[Email] BREVO_API_KEY not set — email sending will fail');
   } else {
-    console.log('[Email] Brevo SMTP ready ✓');
+    console.log('[Email] Brevo API ready ✓');
   }
   if (!process.env.LETTER_SECRET) {
     console.warn('[Email] LETTER_SECRET not set — letter encryption will fail');

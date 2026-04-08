@@ -40,7 +40,6 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_messages_created_at   ON messages(created_at DESC);
   CREATE INDEX IF NOT EXISTS idx_messages_view_token   ON messages(view_token);
   CREATE INDEX IF NOT EXISTS idx_messages_scheduled_at ON messages(scheduled_at);
-  CREATE INDEX IF NOT EXISTS idx_messages_sender_token ON messages(sender_token);
 
   -- Key/value settings store (for runtime config overrides)
   CREATE TABLE IF NOT EXISTS settings (

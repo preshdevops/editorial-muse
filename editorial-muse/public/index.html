@@ -701,6 +701,23 @@ const API_BASE = window.location.origin + '/api';
 /* ══════════════════════════════════════
    STATE
 ══════════════════════════════════════ */
+
+// Generate or retrieve a persistent sender token for this browser
+function getSenderToken() {
+  let token = localStorage.getItem('muse_sender_token');
+  if (!token) {
+    token = crypto.randomUUID ? crypto.randomUUID() : 
+      'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random()*16|0;
+        return (c === 'x' ? r : (r&0x3|0x8)).toString(16);
+      });
+    localStorage.setItem('muse_sender_token', token);
+  }
+  return token;
+}
+
+const SENDER_TOKEN = getSenderToken();
+
 const S = {
   page: null, song: null, channel: 'email', accent: '#ae1417', font: 'serif',
   musicPlaying:false, audioCtx:null, nodes:[], ticker:null, toastTimer:null,
@@ -708,6 +725,11 @@ const S = {
   inboxMessages:[], inboxFilter:'all', inboxSearch:'', inboxPage:1, inboxTotalPages:1,
   backendOnline:false, adminUnlocked:false,
 };
+
+// Helper: build headers with sender token
+function senderHeaders(extra = {}) {
+  return { 'x-sender-token': SENDER_TOKEN, ...extra };
+}
 
 /* ══════════════════════════════════════
    NAVIGATION — history API + mobile nav
@@ -749,6 +771,7 @@ function showPage(id, pushState=true) {
   if (id === 'settings') {
     // Settings is admin-only — require password
     if (!S.adminUnlocked) {
+      S.adminTargetPage = 'settings';
       openAdminLogin();
       return;
     }
@@ -1004,7 +1027,7 @@ async function doSend(){
   if (S.backendOnline) {
     try {
       const res = await fetch(API_BASE+'/send', {
-        method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload),
+        method:'POST', headers: senderHeaders({'Content-Type':'application/json'}), body:JSON.stringify(payload),
       });
       const data = await res.json();
       if (!data.success) throw new Error(data.error || 'Send failed');
@@ -1088,7 +1111,7 @@ async function loadInbox(resetPage=true){
     if (isStatus) params.set('status', filter);
     if (search)   params.set('q', search);
 
-    const res  = await fetch(`${API_BASE}/messages?${params}`);
+    const res  = await fetch(`${API_BASE}/messages?${params}`, { headers: senderHeaders() });
     const data = await res.json();
     const messages = data.messages || [];
     const pagination = data.pagination || { total:0, page:1, pages:1, limit };
@@ -1202,7 +1225,7 @@ async function openDetail(id) {
   let msg = S.inboxMessages.find(m => m.id === id);
   if (S.backendOnline) {
     try {
-      const res  = await fetch(`${API_BASE}/messages/${id}`);
+      const res  = await fetch(`${API_BASE}/messages/${id}`, { headers: senderHeaders() });
       const data = await res.json();
       if (data.success) msg = data.message;
     } catch(_) {}
@@ -1268,7 +1291,7 @@ async function resendMessage(id) {
   if (!S.backendOnline) { toast('Backend not connected.'); return; }
   try {
     toast('Resending… ⏳');
-    const res  = await fetch(`${API_BASE}/messages/${id}/resend`, { method:'POST' });
+    const res  = await fetch(`${API_BASE}/messages/${id}/resend`, { method:'POST', headers: senderHeaders() });
     const data = await res.json();
     if (!data.success) throw new Error(data.error);
     toast('✓ Resent successfully!');
@@ -1281,7 +1304,7 @@ async function resendMessage(id) {
 async function deleteMessage(id) {
   if (!S.backendOnline) { toast('Backend not connected.'); return; }
   try {
-    await fetch(`${API_BASE}/messages/${id}`, { method:'DELETE' });
+    await fetch(`${API_BASE}/messages/${id}`, { method:'DELETE', headers: senderHeaders() });
     S.inboxMessages = S.inboxMessages.filter(m => m.id !== id);
     loadInbox();
     toast('Message deleted.');
@@ -1296,7 +1319,7 @@ async function deleteMessage(id) {
 async function loadStats(){
   if(!S.backendOnline) return;
   try {
-    const res  = await fetch(API_BASE+'/stats');
+    const res  = await fetch(API_BASE+'/stats', { headers: senderHeaders() });
     const data = await res.json();
     const st   = data.stats || {};
     const set  = (id,v) => { const el=document.getElementById(id); if(el) el.textContent = v ?? '0'; };
@@ -1313,7 +1336,7 @@ async function loadStats(){
 async function loadSettings() {
   if (!S.backendOnline) return;
   try {
-    const res  = await fetch(API_BASE+'/settings');
+    const res  = await fetch(API_BASE+'/settings', { headers: senderHeaders() });
     const data = await res.json();
     const s    = data.settings || {};
     const set  = (id, val) => { const el=document.getElementById(id); if(el && val) el.value=val; };
@@ -1343,8 +1366,10 @@ async function saveSettings() {
   if (emailPass && emailPass !== '••••••••') payload.EMAIL_PASS = emailPass;
 
   try {
+    const hdrs = senderHeaders({'Content-Type':'application/json'});
+    if (S.adminPassword) hdrs['x-admin-password'] = S.adminPassword;
     const res  = await fetch(API_BASE+'/settings', {
-      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload),
+      method:'POST', headers:hdrs, body:JSON.stringify(payload),
     });
     const data = await res.json();
     if (!data.success) throw new Error(data.error);
@@ -1363,8 +1388,10 @@ async function testEmail() {
   if (!to) { toast('Enter a test email address first.'); return; }
   toast('Sending test email… ⏳');
   try {
+    const hdrs = senderHeaders({'Content-Type':'application/json'});
+    if (S.adminPassword) hdrs['x-admin-password'] = S.adminPassword;
     const res  = await fetch(API_BASE+'/settings/test-email', {
-      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ to }),
+      method:'POST', headers:hdrs, body:JSON.stringify({ to }),
     });
     const data = await res.json();
     if (!data.success) throw new Error(data.error);
@@ -1514,8 +1541,10 @@ async function submitAdminLogin() {
       S.adminUnlocked = true;
       S.adminPassword = pwd; // store for authenticated API calls
       closeModal('admin');
-      // Now actually navigate to settings
-      showPage('settings');
+      // Navigate to whichever page requested admin
+      const target = S.adminTargetPage || 'settings';
+      S.adminTargetPage = null;
+      showPage(target);
     } else {
       document.getElementById('admin-error').classList.remove('hidden');
       document.getElementById('admin-password').value = '';

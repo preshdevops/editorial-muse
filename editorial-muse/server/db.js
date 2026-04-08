@@ -16,6 +16,7 @@ db.pragma('foreign_keys = ON');
 db.exec(`
   CREATE TABLE IF NOT EXISTS messages (
     id           TEXT PRIMARY KEY,
+    sender_token TEXT,
     to_name      TEXT NOT NULL,
     to_contact   TEXT NOT NULL,
     from_name    TEXT NOT NULL,
@@ -39,6 +40,7 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_messages_created_at   ON messages(created_at DESC);
   CREATE INDEX IF NOT EXISTS idx_messages_view_token   ON messages(view_token);
   CREATE INDEX IF NOT EXISTS idx_messages_scheduled_at ON messages(scheduled_at);
+  CREATE INDEX IF NOT EXISTS idx_messages_sender_token ON messages(sender_token);
 
   -- Key/value settings store (for runtime config overrides)
   CREATE TABLE IF NOT EXISTS settings (
@@ -48,13 +50,21 @@ db.exec(`
   );
 `);
 
+// Migration: add sender_token column to existing databases
+try {
+  db.exec(`ALTER TABLE messages ADD COLUMN sender_token TEXT`);
+} catch(_) { /* column already exists */ }
+try {
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_messages_sender_token ON messages(sender_token)`);
+} catch(_) {}
+
 // ── Queries ───────────────────────────────────────────────────────────────────
 const stmts = {
   insert: db.prepare(`
     INSERT INTO messages
-      (id, to_name, to_contact, from_name, body, song, accent, font, channel, view_token, status, scheduled_at)
+      (id, sender_token, to_name, to_contact, from_name, body, song, accent, font, channel, view_token, status, scheduled_at)
     VALUES
-      (@id, @to_name, @to_contact, @from_name, @body, @song, @accent, @font, @channel, @view_token, @status, @scheduled_at)
+      (@id, @sender_token, @to_name, @to_contact, @from_name, @body, @song, @accent, @font, @channel, @view_token, @status, @scheduled_at)
   `),
 
   markSent: db.prepare(`
@@ -77,7 +87,8 @@ const stmts = {
            view_count, created_at, sent_at, viewed_at, accent, retry_count, scheduled_at
     FROM messages
     WHERE
-      (@status  IS NULL OR status  = @status)
+      sender_token = @sender_token
+      AND (@status  IS NULL OR status  = @status)
       AND (@channel IS NULL OR channel = @channel)
       AND (@q     IS NULL OR (
         to_name    LIKE '%' || @q || '%' OR
@@ -91,7 +102,8 @@ const stmts = {
   searchCount: db.prepare(`
     SELECT COUNT(*) as total FROM messages
     WHERE
-      (@status  IS NULL OR status  = @status)
+      sender_token = @sender_token
+      AND (@status  IS NULL OR status  = @status)
       AND (@channel IS NULL OR channel = @channel)
       AND (@q     IS NULL OR (
         to_name    LIKE '%' || @q || '%' OR
@@ -100,8 +112,9 @@ const stmts = {
       ))
   `),
 
-  getById:    db.prepare(`SELECT * FROM messages WHERE id=?`),
+  getById:    db.prepare(`SELECT * FROM messages WHERE id=? AND sender_token=?`),
   getByToken: db.prepare(`SELECT * FROM messages WHERE view_token=?`),
+  getByIdAny: db.prepare(`SELECT * FROM messages WHERE id=?`),
 
   // Fetch all messages due for scheduled delivery
   getDueScheduled: db.prepare(`
@@ -117,7 +130,7 @@ const stmts = {
     WHERE view_token=?
   `),
 
-  delete: db.prepare(`DELETE FROM messages WHERE id=?`),
+  delete: db.prepare(`DELETE FROM messages WHERE id=? AND sender_token=?`),
 
   stats: db.prepare(`
     SELECT
@@ -131,6 +144,7 @@ const stmts = {
       SUM(CASE WHEN channel='whatsapp' THEN 1 ELSE 0 END) AS via_whatsapp,
       SUM(view_count)                                    AS total_views
     FROM messages
+    WHERE sender_token = ?
   `),
 
   // Settings
@@ -144,19 +158,21 @@ const stmts = {
 
 module.exports = {
   // Messages
-  insertMessage:     (data)        => stmts.insert.run(data),
-  markSent:          (id)          => stmts.markSent.run(id),
-  markFailed:        (msg, id)     => stmts.markFailed.run(msg, id),
-  resetToScheduled:  (id)          => stmts.resetToScheduled.run(id),
-  getMessageById:    (id)          => stmts.getById.get(id),
-  getByToken:        (tok)         => stmts.getByToken.get(tok),
-  getDueScheduled:   ()            => stmts.getDueScheduled.all(),
-  recordView:        (tok)         => stmts.recordView.run(tok),
-  deleteMessage:     (id)          => stmts.delete.run(id),
-  getStats:          ()            => stmts.stats.get(),
+  insertMessage:     (data)              => stmts.insert.run(data),
+  markSent:          (id)                => stmts.markSent.run(id),
+  markFailed:        (msg, id)           => stmts.markFailed.run(msg, id),
+  resetToScheduled:  (id)                => stmts.resetToScheduled.run(id),
+  getMessageById:    (id, senderToken)   => stmts.getById.get(id, senderToken),
+  getMessageByIdAny: (id)                => stmts.getByIdAny.get(id),
+  getByToken:        (tok)               => stmts.getByToken.get(tok),
+  getDueScheduled:   ()                  => stmts.getDueScheduled.all(),
+  recordView:        (tok)               => stmts.recordView.run(tok),
+  deleteMessage:     (id, senderToken)   => stmts.delete.run(id, senderToken),
+  getStats:          (senderToken)       => stmts.stats.get(senderToken),
 
-  searchMessages: ({ status, channel, q, limit = 20, offset = 0 }) => {
+  searchMessages: ({ senderToken, status, channel, q, limit = 20, offset = 0 }) => {
     const params = {
+      sender_token: senderToken,
       status:  status  || null,
       channel: channel || null,
       q:       q       || null,

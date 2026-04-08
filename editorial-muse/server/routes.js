@@ -55,6 +55,16 @@ function requireAdmin(req, res, next) {
   next();
 }
 
+/* ── Sender token middleware ──────────────────────────────────────────────── */
+function requireSenderToken(req, res, next) {
+  const token = req.headers['x-sender-token'];
+  if (!token || token.length < 10) {
+    return res.status(400).json({ success: false, error: 'Sender token required' });
+  }
+  req.senderToken = token;
+  next();
+}
+
 /* ════════════════════════════════════════════════════════════════════════════
    ADMIN
 ════════════════════════════════════════════════════════════════════════════ */
@@ -73,14 +83,14 @@ router.post('/admin/verify', (req, res) => {
 ════════════════════════════════════════════════════════════════════════════ */
 
 // GET /api/messages?status=&q=&page=&limit=
-router.get('/messages', (req, res) => {
+router.get('/messages', requireSenderToken, (req, res) => {
   try {
     const { status, q } = req.query;
     const limit  = Math.min(parseInt(req.query.limit || 20), 100);
     const page   = Math.max(parseInt(req.query.page  || 1),  1);
     const offset = (page - 1) * limit;
 
-    const { messages, total } = db.searchMessages({ status, q, limit, offset });
+    const { messages, total } = db.searchMessages({ senderToken: req.senderToken, status, q, limit, offset });
     ok(res, {
       messages,
       pagination: { total, page, limit, pages: Math.ceil(total / limit) },
@@ -89,16 +99,16 @@ router.get('/messages', (req, res) => {
 });
 
 // GET /api/messages/:id
-router.get('/messages/:id', (req, res) => {
+router.get('/messages/:id', requireSenderToken, (req, res) => {
   try {
-    const msg = db.getMessageById(req.params.id);
+    const msg = db.getMessageById(req.params.id, req.senderToken);
     if (!msg) return fail(res, 'Message not found', 404);
     ok(res, { message: msg });
   } catch (e) { fail(res, e.message, 500); }
 });
 
 // POST /api/messages — save as draft
-router.post('/messages', (req, res) => {
+router.post('/messages', requireSenderToken, (req, res) => {
   const err = validateMessage(req.body);
   if (err) return fail(res, err);
 
@@ -108,6 +118,7 @@ router.post('/messages', (req, res) => {
 
     db.insertMessage({
       id, view_token,
+      sender_token: req.senderToken,
       to_name:      req.body.to_name.trim(),
       to_contact:   req.body.to_contact.trim(),
       from_name:    req.body.from_name.trim(),
@@ -125,8 +136,8 @@ router.post('/messages', (req, res) => {
 });
 
 // POST /api/messages/:id/send — send a saved draft
-router.post('/messages/:id/send', rateLimiter, async (req, res) => {
-  const msg = db.getMessageById(req.params.id);
+router.post('/messages/:id/send', requireSenderToken, rateLimiter, async (req, res) => {
+  const msg = db.getMessageById(req.params.id, req.senderToken);
   if (!msg) return fail(res, 'Message not found', 404);
   if (['sent','read'].includes(msg.status)) return fail(res, 'Message already sent');
 
@@ -142,8 +153,8 @@ router.post('/messages/:id/send', rateLimiter, async (req, res) => {
 });
 
 // POST /api/messages/:id/resend — retry failed
-router.post('/messages/:id/resend', rateLimiter, async (req, res) => {
-  const msg = db.getMessageById(req.params.id);
+router.post('/messages/:id/resend', requireSenderToken, rateLimiter, async (req, res) => {
+  const msg = db.getMessageById(req.params.id, req.senderToken);
   if (!msg) return fail(res, 'Message not found', 404);
   if (msg.retry_count >= 5) return fail(res, 'Maximum retry attempts (5) reached');
 
@@ -159,7 +170,7 @@ router.post('/messages/:id/resend', rateLimiter, async (req, res) => {
 });
 
 // POST /api/send — create + send immediately (or schedule)
-router.post('/send', rateLimiter, async (req, res) => {
+router.post('/send', requireSenderToken, rateLimiter, async (req, res) => {
   const err = validateMessage(req.body);
   if (err) return fail(res, err);
 
@@ -169,6 +180,7 @@ router.post('/send', rateLimiter, async (req, res) => {
 
   const msgData = {
     id, view_token,
+    sender_token: req.senderToken,
     to_name:      req.body.to_name.trim(),
     to_contact:   req.body.to_contact.trim(),
     from_name:    req.body.from_name.trim(),
@@ -205,11 +217,11 @@ router.post('/send', rateLimiter, async (req, res) => {
 });
 
 // DELETE /api/messages/:id
-router.delete('/messages/:id', (req, res) => {
+router.delete('/messages/:id', requireSenderToken, (req, res) => {
   try {
-    const msg = db.getMessageById(req.params.id);
+    const msg = db.getMessageById(req.params.id, req.senderToken);
     if (!msg) return fail(res, 'Message not found', 404);
-    db.deleteMessage(req.params.id);
+    db.deleteMessage(req.params.id, req.senderToken);
     ok(res, { deleted: req.params.id });
   } catch (e) { fail(res, e.message, 500); }
 });
@@ -218,8 +230,8 @@ router.delete('/messages/:id', (req, res) => {
    STATS
 ════════════════════════════════════════════════════════════════════════════ */
 
-router.get('/stats', (req, res) => {
-  try { ok(res, { stats: db.getStats() }); }
+router.get('/stats', requireSenderToken, (req, res) => {
+  try { ok(res, { stats: db.getStats(req.senderToken) }); }
   catch (e) { fail(res, e.message, 500); }
 });
 

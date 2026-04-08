@@ -29,20 +29,18 @@ function decryptBody(stored) {
 }
 
 // ── Create transporter ────────────────────────────────────────────────────────
-function createTransporter() {
-  const password = process.env.BREVO_SMTP_PASSWORD;
-  if (!password) throw new Error('BREVO_SMTP_PASSWORD not set in environment variables');
-
-  return nodemailer.createTransport({
-    host:   'smtp-relay.brevo.com',
-    port:   587,
-    secure: false,
-    auth: {
-      user: 'a5aaf0001@smtp-brevo.com',
-      pass: password,
-    },
-  });
-}
+return nodemailer.createTransport({
+  host:   'smtp-relay.brevo.com',
+  port:   587,
+  secure: false,
+  auth: {
+    user: 'a5aaf0001@smtp-brevo.com',
+    pass: password,
+  },
+  connectionTimeout: 10000,  // 10 seconds
+  greetingTimeout:   10000,
+  socketTimeout:     15000,
+});
 
 // ── HTML email template ───────────────────────────────────────────────────────
 function buildEmailHtml({ to_name, from_name, body, song, accent, viewUrl }) {

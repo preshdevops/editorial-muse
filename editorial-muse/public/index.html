@@ -985,7 +985,7 @@ function openPreview(){
 ══════════════════════════════════════ */
 async function checkBackend(){
   try {
-    const r = await fetch(API_BASE+'/stats',{signal:AbortSignal.timeout(2000)});
+    const r = await fetch(API_BASE+'/stats', { headers: senderHeaders(), signal: AbortSignal.timeout(2000) });
     S.backendOnline = r.ok;
   } catch(_) { S.backendOnline = false; }
   const notice = document.getElementById('api-notice');

@@ -91,23 +91,31 @@ function esc(str) {
 // ── Main send function ────────────────────────────────────────────────────────
 async function sendEmail({ to_contact, to_name, from_name, body, song, accent, viewUrl }) {
   const apiKey = process.env.BREVO_API_KEY;
+  console.log(`[Email] API key present: ${!!apiKey}, prefix: ${apiKey ? apiKey.substring(0, 12) + '...' : 'N/A'}`);
   if (!apiKey) throw new Error('BREVO_API_KEY not set in environment variables');
 
   const fromEmail = process.env.EMAIL_FROM_ADDRESS || 'editorialmuse07@gmail.com';
   const fromName  = 'The Editorial Muse';
 
-  const brevo = new BrevoClient({ apiKey });
+  try {
+    const brevo = new BrevoClient({ apiKey });
 
-  const result = await brevo.transactionalEmails.sendTransacEmail({
-    sender:      { name: fromName, email: fromEmail },
-    to:          [{ email: to_contact, name: to_name }],
-    subject:     `${from_name} wrote you a letter 💌`,
-    textContent: `${to_name},\n\n${body}\n\nWith all my love,\n${from_name}\n\n${song ? '♪ ' + song + '\n\n' : ''}Open the beautiful version: ${viewUrl}`,
-    htmlContent: buildEmailHtml({ to_name, from_name, body, song, accent, viewUrl }),
-  });
+    const result = await brevo.transactionalEmails.sendTransacEmail({
+      sender:      { name: fromName, email: fromEmail },
+      to:          [{ email: to_contact, name: to_name }],
+      subject:     `${from_name} wrote you a letter 💌`,
+      textContent: `${to_name},\n\n${body}\n\nWith all my love,\n${from_name}\n\n${song ? '♪ ' + song + '\n\n' : ''}Open the beautiful version: ${viewUrl}`,
+      htmlContent: buildEmailHtml({ to_name, from_name, body, song, accent, viewUrl }),
+    });
 
-  console.log(`[Email] ✓ Sent to ${to_contact} — ID: ${result.messageId}`);
-  return result;
+    console.log(`[Email] ✓ Sent to ${to_contact} — ID: ${result.messageId}`);
+    return result;
+  } catch (err) {
+    console.error(`[Email] ✗ Full error:`, JSON.stringify(err, null, 2));
+    console.error(`[Email] ✗ Error message:`, err.message);
+    console.error(`[Email] ✗ Error body:`, err.body || err.statusCode || 'no body');
+    throw err;
+  }
 }
 
 // ── Warm up / env check ───────────────────────────────────────────────────────
